@@ -1,67 +1,184 @@
-'use client';
+"use client"
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import type { User } from '@supabase/supabase-js';
-import { supabase } from '@/supabase'; // if this alias fails, use: import { supabase } from '../supabase';
+import type React from "react"
+
+import { createContext, useContext, useEffect, useState } from "react"
+import type { User } from "@supabase/supabase-js"
+import { supabase } from "../supabase"
+
+type UserProfile = {
+  id: string
+  email: string
+  role: "admin" | "view"
+}
 
 type AuthContextType = {
-  user: User | null;
-  loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ data: any; error: any }>;
-  signUp: (email: string, password: string) => Promise<{ data: any; error: any }>;
-  signOut: () => Promise<void>;
-};
+  user: User | null
+  profile: UserProfile | null
+  loading: boolean
+  signIn: (email: string, password: string) => Promise<{ error?: string }>
+  signUp: (email: string, password: string) => Promise<{ error?: string }>
+  signOut: () => Promise<void>
+  isAdmin: boolean
+}
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null)
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    // Get initial session
+    const initializeAuth = async () => {
+      try {
+        console.log("[v0] Initializing auth...")
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession()
 
-    // subscribe to auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+        if (error) {
+          console.error("[v0] Error getting session:", error)
+          setLoading(false)
+          return
+        }
 
-    return () => subscription.unsubscribe();
-  }, []);
+        console.log("[v0] Session:", session ? "exists" : "none")
+        setUser(session?.user ?? null)
 
-  const signIn = useCallback(async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    return { data, error };
-  }, []);
+        if (session?.user) {
+          await fetchProfile(session.user.id)
+        } else {
+          setLoading(false)
+        }
+      } catch (error) {
+        console.error("[v0] Error initializing auth:", error)
+        setLoading(false)
+      }
+    }
 
-  const signUp = useCallback(async (email: string, password: string) => {
-    const redirect = `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`;
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { emailRedirectTo: redirect },
-    });
-    return { data, error };
-  }, []);
+    initializeAuth()
 
-  const signOut = useCallback(async () => {
-    await supabase.auth.signOut();
-  }, []);
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("[v0] Auth state changed:", event)
+      setUser(session?.user ?? null)
+      if (session?.user) {
+        await fetchProfile(session.user.id)
+      } else {
+        setProfile(null)
+        setLoading(false)
+      }
+    })
 
-  return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut }}>
-      {children}
-    </AuthContext.Provider>
-  );
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const fetchProfile = async (userId: string) => {
+    try {
+      console.log("[v0] Fetching profile for user:", userId)
+      const { data, error } = await supabase.from("users").select("*").eq("id", userId).single()
+
+      if (error) {
+        console.log("[v0] Profile fetch error:", error.code, error.message)
+        if (error.code === "PGRST116") {
+          console.log("[v0] No profile found, creating default profile")
+          const defaultProfile = {
+            id: userId,
+            email: user?.email || "",
+            role: "view" as const,
+          }
+          setProfile(defaultProfile)
+        } else {
+          console.error("[v0] Database error:", error)
+          throw error
+        }
+      } else {
+        console.log("[v0] Profile loaded:", data)
+        setProfile(data)
+      }
+    } catch (error) {
+      console.error("[v0] Error fetching profile:", error)
+      const fallbackProfile = {
+        id: userId,
+        email: user?.email || "",
+        role: "view" as const,
+      }
+      setProfile(fallbackProfile)
+    } finally {
+      console.log("[v0] Setting loading to false")
+      setLoading(false)
+    }
+  }
+
+  const signIn = async (email: string, password: string) => {
+    try {
+      console.log("[v0] Attempting sign in for:", email)
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+      if (error) {
+        console.error("[v0] Sign in error:", error.message)
+        return { error: error.message }
+      }
+      console.log("[v0] Sign in successful")
+      return {}
+    } catch (error) {
+      console.error("[v0] Sign in exception:", error)
+      return { error: "An unexpected error occurred" }
+    }
+  }
+
+  const signUp = async (email: string, password: string) => {
+    try {
+      console.log("[v0] Attempting sign up for:", email)
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: process.env.NEXT_PUBLIC_SITE_URL
+            ? `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+            : `${window.location.origin}/auth/callback`,
+        },
+      })
+      if (error) {
+        console.error("[v0] Sign up error:", error.message)
+        return { error: error.message }
+      }
+      console.log("[v0] Sign up successful")
+      return {}
+    } catch (error) {
+      console.error("[v0] Sign up exception:", error)
+      return { error: "An unexpected error occurred" }
+    }
+  }
+
+  const signOut = async () => {
+    await supabase.auth.signOut()
+  }
+
+  const value = {
+    user,
+    profile,
+    loading,
+    signIn,
+    signUp,
+    signOut,
+    isAdmin: profile?.role === "admin",
+  }
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
 export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used within an AuthProvider');
-  return ctx;
+  const context = useContext(AuthContext)
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider")
+  }
+  return context
 }
