@@ -1,5 +1,6 @@
-# netlify.toml  (root of repo)
+# netlify.toml at REPO ROOT
 [build]
+  base = "supabase-scheduler-10"
   command = "pnpm build"
   publish = ".next"
 
