@@ -1,0 +1,2223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>R&S Weekly Schedule</title>
+<style>
+/* Base Styles with Purple Pastel Color Scheme */
+:root {
+  --primary-color: #d1a3ff; /* Main purple pastel */
+  --secondary-color: #f0d4ff; /* Lighter purple pastel */
+  --accent-color: #b5c9ff; /* Complementary blue pastel */
+  --light-color: #f8f5ff; /* Very light purple tint */
+  --dark-color: #4a3b5c; /* Dark purple for text */
+  --success-color: #c8e6c9; /* Light green */
+  --warning-color: #fff0c8; /* Light yellow */
+  --danger-color: #ffcdd2; /* Light red */
+  --border-radius: 8px;
+  --box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+body { 
+  font-family: 'Segoe UI', sans-serif; 
+  background: var(--light-color); 
+  margin: 0; 
+  padding: 0;
+  color: var(--dark-color);
+}
+
+/* Login Page Styles */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+}
+
+.login-box {
+  background: white;
+  padding: 30px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  width: 350px;
+  max-width: 90%;
+  text-align: center;
+}
+
+.login-box h2 {
+  margin-bottom: 20px;
+  color: var(--dark-color);
+}
+
+.login-form input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  box-sizing: border-box;
+}
+
+.login-form button {
+  width: 100%;
+  padding: 10px;
+  background: var(--primary-color);
+  color: var(--dark-color);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.login-form button:hover {
+  background: #c08aff;
+}
+
+.forgot-password {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #666;
+  cursor: pointer;
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+.login-error {
+  color: #e74c3c;
+  margin-bottom: 15px;
+  font-size: 14px;
+  display: none;
+}
+
+/* Main App Styles */
+header { 
+  background: var(--primary-color); 
+  padding: 10px; 
+  display: flex; 
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.header-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--dark-color);
+  margin: 5px 0;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+nav button { 
+  background: transparent; 
+  border: none; 
+  color: var(--dark-color); 
+  font-size: 16px; 
+  margin: 5px; 
+  cursor: pointer; 
+  padding: 5px 10px;
+  border-radius: var(--border-radius);
+}
+
+nav button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+nav button.active { 
+  background: white; 
+  color: var(--dark-color); 
+  font-weight: bold; 
+  border-radius: var(--border-radius); 
+}
+
+.user-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 5px 0;
+}
+
+.user-info {
+  margin-right: 15px;
+  font-size: 14px;
+}
+
+.logout-btn {
+  background: var(--secondary-color);
+  color: var(--dark-color);
+  border: none;
+  padding: 5px 10px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+}
+
+.page { 
+  display: none; 
+  padding: 20px; 
+}
+
+.page.active { 
+  display: block; 
+}
+
+.controls { 
+  text-align: center; 
+  margin-bottom: 20px; 
+  background: var(--secondary-color);
+  padding: 15px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  overflow-x: auto;
+}
+
+button.primary { 
+  padding: 8px 12px; 
+  margin: 5px; 
+  background: var(--primary-color); 
+  color: var(--dark-color); 
+  border: none; 
+  border-radius: var(--border-radius); 
+  cursor: pointer; 
+  font-size: 14px; 
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+button.primary:hover {
+  background: #c08aff;
+  transform: translateY(-2px);
+}
+
+h1, h2 {
+  color: var(--dark-color);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Resources Styles */
+.resources { 
+  display: flex; 
+  gap: 20px; 
+  margin-bottom: 20px; 
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.resource-section { 
+  background: white; 
+  border: 1px solid var(--secondary-color); 
+  border-radius: var(--border-radius); 
+  padding: 15px; 
+  width: 180px;
+  box-shadow: var(--box-shadow);
+  min-width: 150px;
+  flex: 1;
+  max-width: 250px;
+}
+
+.resource-section h3 { 
+  margin: 0 0 10px 0; 
+  font-size: 16px; 
+  text-align: center; 
+  color: var(--dark-color);
+  padding-bottom: 5px;
+  border-bottom: 2px solid var(--primary-color);
+}
+
+.resource-section textarea { 
+  width: 100%; 
+  height: 60px; 
+  padding: 8px; 
+  margin-bottom: 10px; 
+  border: 1px solid var(--primary-color); 
+  border-radius: var(--border-radius); 
+  font-size: 14px;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.resource-section input[type="text"] { 
+  display: none; 
+}
+
+.resource-list { 
+  max-height: 150px; 
+  overflow-y: auto; 
+  border: 1px dashed var(--secondary-color); 
+  padding: 8px;
+  border-radius: var(--border-radius);
+  background: #fafafa;
+}
+
+/* Board Styles */
+.board { 
+  display: flex; 
+  overflow-x: auto; 
+  gap: 15px; 
+  padding: 15px; 
+  min-height: 250px; 
+  border-top: 1px solid var(--secondary-color);
+  background: var(--light-color);
+  border-radius: var(--border-radius);
+  margin-bottom: 20px;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+.column { 
+  background: white; 
+  border: 2px solid var(--secondary-color); 
+  border-radius: var(--border-radius); 
+  width: 180px; 
+  min-height: 220px; 
+  padding: 10px; 
+  display: flex; 
+  flex-direction: column;
+  box-shadow: var(--box-shadow);
+  flex: 0 0 auto;
+}
+
+.column input { 
+  border: 1px solid var(--primary-color); 
+  border-radius: var(--border-radius); 
+  padding: 8px; 
+  margin-bottom: 10px; 
+  font-size: 14px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.column.selected { 
+  border: 2px solid #ff9e80; 
+  background-color: #fff8e0; 
+}
+
+/* Status Boxes Styles */
+.permanent-boxes-header { 
+  margin-top: 30px; 
+  border-top: 1px solid var(--secondary-color); 
+  padding-top: 20px; 
+}
+
+.permanent-boxes-container { 
+  display: flex; 
+  justify-content: space-around; 
+  margin: 20px 0;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.permanent-box { 
+  background: white; 
+  border: 2px solid var(--secondary-color); 
+  border-radius: var(--border-radius); 
+  width: 22%; 
+  min-height: 150px; 
+  padding: 10px;
+  box-shadow: var(--box-shadow);
+  min-width: 200px;
+  flex: 1;
+}
+
+.permanent-box h3 { 
+  text-align: center; 
+  margin: 5px 0 10px 0; 
+  background: var(--secondary-color); 
+  padding: 8px; 
+  border-radius: var(--border-radius);
+  color: var(--dark-color);
+}
+
+/* Tile Styles */
+.tile { 
+  padding: 8px; 
+  border-radius: var(--border-radius); 
+  margin: 5px 0; 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  cursor: move; 
+  font-size: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  touch-action: none; /* Improves touch handling */
+}
+
+.tile.crew { 
+  background: var(--primary-color); 
+}
+
+.tile.truck { 
+  background: var(--secondary-color); 
+}
+
+.tile.trailer { 
+  background: var(--success-color); 
+}
+
+.tile.equipment { 
+  background: var(--warning-color); 
+}
+
+.tile.combo { 
+  background: linear-gradient(135deg, var(--primary-color) 25%, var(--secondary-color) 25%, var(--secondary-color) 50%, var(--success-color) 50%, var(--success-color) 75%, var(--warning-color) 75%); 
+}
+
+.tile-buttons button { 
+  background: transparent; 
+  border: none; 
+  font-size: 14px; 
+  cursor: pointer; 
+  margin-left: 5px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  min-width: 24px;
+  min-height: 24px;
+}
+
+.tile-buttons button:hover {
+  opacity: 1;
+}
+
+.tile.selected { 
+  border: 2px solid #ff9e80; 
+  box-shadow: 0 0 5px rgba(255, 158, 128, 0.5);
+}
+
+/* Location Styles */
+.location-zone { 
+  background: white; 
+  border: 2px solid var(--secondary-color); 
+  border-radius: var(--border-radius); 
+  width: 220px; 
+  min-height: 200px; 
+  padding: 10px; 
+  margin: 10px;
+  box-shadow: var(--box-shadow);
+  flex: 1;
+  min-width: 200px;
+}
+
+.location-zone h3 { 
+  text-align: center; 
+  margin: 5px 0 10px 0;
+  background: var(--secondary-color);
+  padding: 8px;
+  border-radius: var(--border-radius);
+  color: var(--dark-color);
+}
+
+.location-container { 
+  display: flex; 
+  flex-wrap: wrap; 
+  justify-content: center; 
+  margin-top: 20px; 
+  gap: 15px;
+}
+
+.locations-header { 
+  margin-top: 30px; 
+  border-top: 1px solid var(--secondary-color); 
+  padding-top: 20px; 
+}
+
+/* Combo Controls */
+.combo-controls { 
+  margin: 15px 0; 
+  text-align: center;
+  background: var(--secondary-color);
+  padding: 15px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+
+.combo-name { 
+  width: 180px; 
+  padding: 8px; 
+  margin-right: 10px;
+  border: 1px solid var(--primary-color);
+  border-radius: var(--border-radius);
+}
+
+/* User Management Styles */
+.user-management {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  padding: 20px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  overflow-x: auto;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.user-table th, .user-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.user-table th {
+  background-color: var(--primary-color);
+  color: var(--dark-color);
+}
+
+.user-table tr:nth-child(even) {
+  background-color: var(--light-color);
+}
+
+.user-form {
+  background: var(--secondary-color);
+  padding: 15px;
+  border-radius: var(--border-radius);
+  margin-bottom: 20px;
+}
+
+.user-form h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  box-sizing: border-box;
+}
+
+.action-btn {
+  padding: 5px 10px;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 14px;
+  margin: 2px;
+}
+
+.edit-btn {
+  background-color: var(--primary-color);
+  color: var(--dark-color);
+}
+
+.delete-btn {
+  background-color: var(--danger-color);
+  color: var(--dark-color);
+}
+
+.reset-btn {
+  background-color: var(--warning-color);
+  color: var(--dark-color);
+}
+
+/* Modal Styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: white;
+  margin: 15% auto;
+  padding: 20px;
+  border-radius: var(--border-radius);
+  width: 350px;
+  max-width: 90%;
+  box-shadow: var(--box-shadow);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.modal-header h3 {
+  margin: 0;
+}
+
+.close-modal {
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.modal-body {
+  margin-bottom: 20px;
+}
+
+.modal-footer {
+  text-align: right;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+/* Tooltips */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltip-text {
+  visibility: hidden;
+  width: 120px;
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Enhanced Mobile Responsiveness */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    padding: 10px 5px;
+  }
+  
+  .header-title {
+    margin-bottom: 10px;
+  }
+  
+  nav {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+  
+  nav button {
+    padding: 8px;
+    margin: 3px;
+    font-size: 14px;
+  }
+  
+  .user-controls {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .resources {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .resource-section {
+    width: 90%;
+    max-width: none;
+  }
+  
+  .permanent-box {
+    width: 90%;
+    margin-bottom: 15px;
+    min-width: 0;
+  }
+  
+  .location-zone {
+    width: 90%;
+    min-width: 0;
+  }
+  
+  .controls {
+    padding: 10px;
+  }
+  
+  button.primary {
+    padding: 8px;
+    font-size: 13px;
+  }
+  
+  .combo-name {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+  
+  .combo-controls {
+    padding: 10px;
+  }
+  
+  .board {
+    padding: 10px 5px;
+  }
+  
+  .column {
+    min-width: 160px;
+  }
+  
+  .user-management {
+    padding: 10px;
+  }
+  
+  .user-table th, .user-table td {
+    padding: 8px 5px;
+    font-size: 13px;
+  }
+  
+  .action-btn {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+}
+
+/* Password Change Modal */
+#passwordChangeModal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.password-change-content {
+  background-color: white;
+  margin: 15% auto;
+  padding: 20px;
+  border-radius: var(--border-radius);
+  width: 350px;
+  max-width: 90%;
+  box-shadow: var(--box-shadow);
+}
+
+/* Touch-friendly improvements */
+@media (pointer: coarse) {
+  .tile {
+    padding: 12px 8px;
+    margin: 8px 0;
+  }
+  
+  .tile-buttons button {
+    padding: 5px;
+    min-width: 30px;
+    min-height: 30px;
+  }
+  
+  button.primary {
+    padding: 10px 15px;
+  }
+  
+  .column input {
+    padding: 10px;
+  }
+  
+  select, input[type="text"], input[type="password"] {
+    font-size: 16px; /* Prevents iOS zoom on focus */
+    padding: 10px;
+  }
+}
+</style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+<!-- Login Page -->
+<div id="loginPage" class="login-container">
+  <div class="login-box">
+    <h2>🔐 R&S Weekly Schedule</h2>
+    <div id="loginError" class="login-error">Invalid username or password</div>
+    <form class="login-form" id="loginForm" onsubmit="return false;">
+      <input type="text" id="username" placeholder="Username" required>
+      <input type="password" id="password" placeholder="Password" required>
+      <button type="submit" onclick="attemptLogin()">🚀 Login</button>
+      <div class="forgot-password" onclick="showForgotPassword()">Forgot password?</div>
+    </form>
+  </div>
+</div>
+
+<!-- Forgot Password Modal -->
+<div id="forgotPasswordModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>🔑 Forgot Password</h3>
+      <span class="close-modal" onclick="closeForgotPassword()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <p>Please enter your username to reset your password.</p>
+      <input type="text" id="resetUsername" placeholder="Username" style="width: 100%; padding: 8px; margin-top: 10px; border: 1px solid #ddd; border-radius: 8px;">
+      <div id="resetMessage" style="margin-top: 10px; color: #27ae60; display: none;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="primary" onclick="requestPasswordReset()">Reset Password</button>
+    </div>
+  </div>
+</div>
+
+<!-- Password Change Modal -->
+<div id="passwordChangeModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>🔐 Change Password</h3>
+      <span class="close-modal" onclick="closePasswordChange()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <p>Please change your default password to continue.</p>
+      <div class="form-group">
+        <label for="newPassword1">New Password</label>
+        <input type="password" id="newPassword1" placeholder="Enter new password">
+      </div>
+      <div class="form-group">
+        <label for="newPassword2">Confirm Password</label>
+        <input type="password" id="newPassword2" placeholder="Confirm new password">
+      </div>
+      <div id="passwordChangeMessage" style="margin-top: 10px; color: #e74c3c; display: none;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="primary" onclick="changePassword()">Update Password</button>
+    </div>
+  </div>
+</div>
+
+<!-- Main Application -->
+<div id="appContainer" style="display: none;">
+  <header>
+    <div class="header-title">R&S Weekly Schedule</div>
+    <nav>
+      <button id="tab1" class="active" onclick="showPage(1)">📋 Board & Resources</button>
+      <button id="tab2" onclick="showPage(2)">💾 Saved Schedules</button>
+      <button id="tab3" onclick="showPage(3)" class="admin-only">👥 User Management</button>
+    </nav>
+    <div class="user-controls">
+      <button id="btnSyncNow" class="logout-btn" title="Force cloud load/save">☁️ Sync now</button>
+      <button id="btnAutoSync" class="logout-btn" title="Toggle 30s auto-sync">⏱ Auto-sync (30s)</button>
+      <!-- Combo Save Button hidden -->
+      <div class="user-info">
+        <span id="currentUser">User</span> (<span id="userRole">Role</span>)
+      </div>
+      <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+  </header>
+
+  <!-- Page 1: Board & Resources -->
+  <div id="page1" class="page active">
+    <h1>📅 Weekly Sites & Resources</h1>
+    <div class="controls">
+      <button class="primary" onclick="addSite()">➕ Add Site</button>
+      <button class="primary" onclick="deleteSite()">🗑️ Delete Site</button>
+      <button class="primary" onclick="clearSites()">🧹 Clear Board</button>
+      <button class="primary" onclick="eraseBoard()">🗑️ Erase Board</button>
+      <button class="primary" onclick="autoSave()">💾 Auto-Save</button>
+      <button class="primary" onclick="loadSaved()">📂 Load</button>
+      <select id="savedSelectFirst"></select>
+      <button class="primary" onclick="saveSnapshot()">📸 Save Snapshot</button>
+    </div>
+    <div class="combo-controls" style="display:none;">
+      <input type="text" class="combo-name" id="comboName" placeholder="Combo Name">
+      <button class="primary" onclick="addCombo()">🔄 Add Combo</button>
+    </div>
+    <div class="resources">
+      <div class="resource-section">
+        <h3>👷 Crew</h3>
+        <textarea id="crewInput" placeholder="One name per line"></textarea>
+        <button class="primary" onclick="addCrew()">➕ </button>
+        <button class="primary" onclick="clearCrew()">🧹 </button>
+        <div id="crewList" class="resource-list" ondragover="allowDrop(event)" ondrop="drop(event)"></div>
+      </div>
+      <div class="resource-section">
+        <h3>🚚 Trucks</h3>
+        <textarea id="truckInput" placeholder="One tag per line"></textarea>
+        <button class="primary" onclick="addTruck()">➕ </button>
+        <button class="primary" onclick="clearTruck()">🧹 </button>
+        <div id="truckList" class="resource-list" ondragover="allowDrop(event)" ondrop="drop(event)"></div>
+      </div>
+      <div class="resource-section">
+        <h3>🚛 Trailers</h3>
+        <textarea id="trailerInput" placeholder="One tag per line"></textarea>
+        <button class="primary" onclick="addTrailer()">➕ </button>
+        <button class="primary" onclick="clearTrailer()">🧹 </button>
+        <div id="trailerList" class="resource-list" ondragover="allowDrop(event)" ondrop="drop(event)"></div>
+      </div>
+      <div class="resource-section">
+        <h3>🔧 Equipment</h3>
+        <textarea id="equipmentInput" placeholder="One item per line"></textarea>
+        <button class="primary" onclick="addEquipment()">➕ </button>
+        <button class="primary" onclick="clearEquipment()">🧹 </button>
+        <div id="equipmentList" class="resource-list" ondragover="allowDrop(event)" ondrop="drop(event)"></div>
+      </div>
+      <div class="resource-section" style="display:none;">
+        <h3>🔄 Combos</h3>
+        <div id="comboList" class="resource-list" ondragover="allowDrop(event)" ondrop="drop(event)"></div>
+      </div>
+    </div>
+    <div class="board" id="board" ondragover="allowDrop(event)" ondrop="drop(event)"></div>
+    <!-- Permanent Status Boxes -->
+    <div class="permanent-boxes-header">
+      <h2>📊 Status Zones</h2>
+    </div>
+    <div class="permanent-boxes-container">
+      <div class="permanent-box" id="off-box" ondragover="allowDrop(event)" ondrop="drop(event)">
+        <h3>🏠 Off</h3>
+      </div>
+      <div class="permanent-box" id="available-box" ondragover="allowDrop(event)" ondrop="drop(event)">
+        <h3>✅ Available</h3>
+      </div>
+      <div class="permanent-box" id="shop-box" ondragover="allowDrop(event)" ondrop="drop(event)">
+        <h3>🔧 Shop/Logistics</h3>
+      </div>
+      <div class="permanent-box" id="djmuse-box" ondragover="allowDrop(event)" ondrop="drop(event)">
+        <h3>🏢 DJM Use</h3>
+      </div>
+    </div>
+
+    <!-- Locations Section -->
+    <div class="locations-header">
+      <h2>📍 Locations</h2>
+      <div class="controls">
+        <button class="primary" onclick="saveLocationBoard()">💾 Save Locations</button>
+        <button class="primary" onclick="clearLocationBoard()">🧹 Clear Locations</button>
+      </div>
+    </div>
+    <div class="location-container">
+      <div class="location-zone" id="kc-zone" ondragover="allowDrop(event)" ondrop="dropLocation(event, 'KC')">
+        <h3>🏙️ KC</h3>
+      </div>
+      <div class="location-zone" id="indy-zone" ondragover="allowDrop(event)" ondrop="dropLocation(event, 'Indy')">
+        <h3>🏁 Indy</h3>
+      </div>
+      <div class="location-zone" id="stl-zone" ondragover="allowDrop(event)" ondrop="dropLocation(event, 'STL')">
+        <h3>🌉 STL</h3>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page 2: Saved Schedules -->
+  <div id="page2" class="page">
+    <h1>💾 Saved Schedules</h1>
+    <div class="controls">
+      <select id="savedSelect"></select>
+      <button class="primary" onclick="loadSavedPage2()">📂 Load Sites</button>
+      <button class="primary" onclick="saveSnapshotPage2()">📸 Save Snapshot</button>
+      <button class="primary" onclick="clearSavedLogs()">🧹 Clear Saved Logs</button>
+    </div>
+    <div id="savedBoardDisplay" class="board"></div>
+  </div>
+
+  <!-- Page 3: User Management (Admin Only) -->
+  <div id="page3" class="page">
+    <h1>👥 User Management</h1>
+    <div class="user-management">
+      <div class="user-form">
+        <h3>➕ Add New User</h3>
+        <div class="form-group">
+          <label for="newUsername">Username</label>
+          <input type="text" id="newUsername" required>
+        </div>
+        <div class="form-group">
+          <label for="newRole">Role</label>
+          <select id="newRole">
+            <option value="admin">Admin</option>
+            <option value="view">View Only</option>
+          </select>
+        </div>
+        <button class="primary" onclick="addUser()">➕ Add User</button>
+      </div>
+      
+      <div class="controls">
+        <button class="primary" onclick="resetAllPasswords()">🔑 Reset All Passwords to 1234</button>
+      </div>
+      
+      <h3>🧑‍💼 User List</h3>
+      <table class="user-table">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Role</th>
+            <th>Password Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody">
+          <!-- User rows will be added here dynamically -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+// User Authentication System
+let currentUser = null;
+let isAdmin = false;
+const DEFAULT_PASSWORD = '1234';
+
+// Initialize users if not exists
+if (!localStorage.getItem('users')) {
+  const defaultUsers = [
+    { username: 'ADMIN', password: '4630', role: 'admin', passwordChanged: true }
+  ];
+  localStorage.setItem('users', JSON.stringify(defaultUsers));
+}
+
+function attemptLogin() {
+  const username = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
+  const users = JSON.parse(localStorage.getItem('users'));
+  
+  const user = users.find(u => u.username === username && u.password === password);
+  
+  if (user) {
+    currentUser = user.username;
+    isAdmin = user.role === 'admin';
+    
+    // Check if password needs to be changed (for non-admin users)
+    if (user.role === 'view' && (!user.passwordChanged || user.passwordChanged === false)) {
+      showPasswordChangeModal();
+      return;
+    }
+    
+    // Update UI
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('appContainer').style.display = 'block';
+    document.getElementById('currentUser').textContent = currentUser;
+    document.getElementById('userRole').textContent = user.role;
+    
+    // Show/hide admin features
+    updateAdminVisibility();
+    
+    // Load data
+    renderAll();
+    populateSavedFirst();
+    populateSaved();
+    loadLocationData();
+    
+    if (isAdmin) {
+      loadUsers();
+    }
+  } else {
+    document.getElementById('loginError').style.display = 'block';
+    setTimeout(() => {
+      document.getElementById('loginError').style.display = 'none';
+    }, 3000);
+  }
+}
+
+function showPasswordChangeModal() {
+  document.getElementById('passwordChangeModal').style.display = 'block';
+  document.getElementById('newPassword1').value = '';
+  document.getElementById('newPassword2').value = '';
+  document.getElementById('passwordChangeMessage').style.display = 'none';
+}
+
+function closePasswordChange() {
+  document.getElementById('passwordChangeModal').style.display = 'none';
+  // Log out if they cancel password change
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
+}
+
+function changePassword() {
+  const newPassword1 = document.getElementById('newPassword1').value;
+  const newPassword2 = document.getElementById('newPassword2').value;
+  
+  if (!newPassword1 || !newPassword2) {
+    document.getElementById('passwordChangeMessage').textContent = 'Please fill in both fields';
+    document.getElementById('passwordChangeMessage').style.display = 'block';
+    return;
+  }
+  
+  if (newPassword1 !== newPassword2) {
+    document.getElementById('passwordChangeMessage').textContent = 'Passwords do not match';
+    document.getElementById('passwordChangeMessage').style.display = 'block';
+    return;
+  }
+  
+  // Update password
+  const users = JSON.parse(localStorage.getItem('users'));
+  const userIndex = users.findIndex(u => u.username === currentUser);
+  
+  if (userIndex !== -1) {
+    users[userIndex].password = newPassword1;
+    users[userIndex].passwordChanged = true;
+    localStorage.setItem('users', JSON.stringify(users));
+    
+    // Close modal and continue to app
+    document.getElementById('passwordChangeModal').style.display = 'none';
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('appContainer').style.display = 'block';
+    document.getElementById('currentUser').textContent = currentUser;
+    document.getElementById('userRole').textContent = users[userIndex].role;
+    
+    // Show/hide admin features
+    updateAdminVisibility();
+    
+    // Load data
+    renderAll();
+    populateSavedFirst();
+    populateSaved();
+    loadLocationData();
+  }
+}
+
+function logout() {
+  currentUser = null;
+  isAdmin = false;
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('appContainer').style.display = 'none';
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
+}
+
+function updateAdminVisibility() {
+  const adminElements = document.querySelectorAll('.admin-only');
+  adminElements.forEach(el => {
+    el.style.display = isAdmin ? 'block' : 'none';
+  });
+}
+
+// Forgot Password
+function showForgotPassword() {
+  document.getElementById('forgotPasswordModal').style.display = 'block';
+}
+
+function closeForgotPassword() {
+  document.getElementById('forgotPasswordModal').style.display = 'none';
+  document.getElementById('resetUsername').value = '';
+  document.getElementById('resetMessage').style.display = 'none';
+}
+
+function requestPasswordReset() {
+  const username = document.getElementById('resetUsername').value;
+  const users = JSON.parse(localStorage.getItem('users'));
+  
+  const userExists = users.some(u => u.username === username);
+  
+  if (userExists) {
+    document.getElementById('resetMessage').textContent = 'Password reset request sent. Please contact your administrator.';
+    document.getElementById('resetMessage').style.color = '#27ae60';
+    document.getElementById('resetMessage').style.display = 'block';
+    
+    setTimeout(() => {
+      closeForgotPassword();
+    }, 3000);
+  } else {
+    document.getElementById('resetMessage').textContent = 'Username not found.';
+    document.getElementById('resetMessage').style.color = '#e74c3c';
+    document.getElementById('resetMessage').style.display = 'block';
+  }
+}
+
+// User Management
+function loadUsers() {
+  const users = JSON.parse(localStorage.getItem('users'));
+  const tableBody = document.getElementById('userTableBody');
+  tableBody.innerHTML = '';
+  
+  users.forEach(user => {
+    const row = document.createElement('tr');
+    
+    const usernameCell = document.createElement('td');
+    usernameCell.textContent = user.username;
+    row.appendChild(usernameCell);
+    
+    const roleCell = document.createElement('td');
+    roleCell.textContent = user.role;
+    row.appendChild(roleCell);
+    
+    const passwordStatusCell = document.createElement('td');
+    passwordStatusCell.textContent = user.passwordChanged ? 'Changed' : 'Default';
+    row.appendChild(passwordStatusCell);
+    
+    const actionsCell = document.createElement('td');
+    
+    // Don't allow actions on the current user or the ADMIN account
+    if (user.username !== currentUser && user.username !== 'ADMIN') {
+      const resetBtn = document.createElement('button');
+      resetBtn.textContent = '🔑 Reset';
+      resetBtn.className = 'action-btn reset-btn';
+      resetBtn.onclick = () => resetPassword(user.username);
+      actionsCell.appendChild(resetBtn);
+      
+      const deleteBtn = document.createElement('button');
+      deleteBtn.textContent = '🗑️ Delete';
+      deleteBtn.className = 'action-btn delete-btn';
+      deleteBtn.onclick = () => deleteUser(user.username);
+      actionsCell.appendChild(deleteBtn);
+    } else {
+      actionsCell.textContent = user.username === 'ADMIN' ? 'Default Admin' : 'Current User';
+    }
+    
+    row.appendChild(actionsCell);
+    tableBody.appendChild(row);
+  });
+}
+
+function addUser() {
+  const username = document.getElementById('newUsername').value;
+  const role = document.getElementById('newRole').value;
+  
+  if (!username) {
+    alert('Please enter a username');
+    return;
+  }
+  
+  const users = JSON.parse(localStorage.getItem('users'));
+  
+  // Check if username already exists
+  if (users.some(u => u.username === username)) {
+    alert('Username already exists');
+    return;
+  }
+  
+  // Add new user with default password
+  users.push({ 
+    username, 
+    password: DEFAULT_PASSWORD, 
+    role,
+    passwordChanged: false
+  });
+  
+  localStorage.setItem('users', JSON.stringify(users));
+  
+  // Clear form
+  document.getElementById('newUsername').value = '';
+  
+  // Reload user list
+  loadUsers();
+  
+  alert(`User ${username} added with default password: ${DEFAULT_PASSWORD}`);
+}
+
+function resetPassword(username) {
+  const users = JSON.parse(localStorage.getItem('users'));
+  const userIndex = users.findIndex(u => u.username === username);
+  
+  if (userIndex !== -1) {
+    users[userIndex].password = DEFAULT_PASSWORD;
+    users[userIndex].passwordChanged = false;
+    localStorage.setItem('users', JSON.stringify(users));
+    alert(`Password for ${username} has been reset to ${DEFAULT_PASSWORD}`);
+    loadUsers();
+  }
+}
+
+function resetAllPasswords() {
+  if (confirm('Are you sure you want to reset ALL user passwords to 1234?')) {
+    const users = JSON.parse(localStorage.getItem('users'));
+    
+    users.forEach(user => {
+      // Don't reset the current admin user or the default ADMIN
+      if (user.username !== currentUser && user.username !== 'ADMIN') {
+        user.password = DEFAULT_PASSWORD;
+        user.passwordChanged = false;
+      }
+    });
+    
+    localStorage.setItem('users', JSON.stringify(users));
+    alert('All passwords have been reset to 1234');
+    loadUsers();
+  }
+}
+
+function deleteUser(username) {
+  if (confirm(`Are you sure you want to delete user ${username}?`)) {
+    const users = JSON.parse(localStorage.getItem('users'));
+    const filteredUsers = users.filter(u => u.username !== username);
+    localStorage.setItem('users', JSON.stringify(filteredUsers));
+    loadUsers();
+  }
+}
+
+// Tab navigation
+function showPage(n) {
+  // Hide all pages
+  document.getElementById('page1').style.display = 'none';
+  document.getElementById('page2').style.display = 'none';
+  document.getElementById('page3').style.display = 'none';
+  
+  // Remove active class from all tabs
+  document.getElementById('tab1').classList.remove('active');
+  document.getElementById('tab2').classList.remove('active');
+  document.getElementById('tab3').classList.remove('active');
+  
+  // Show selected page and activate tab
+  document.getElementById('page' + n).style.display = 'block';
+  document.getElementById('tab' + n).classList.add('active');
+  
+  // Additional actions for specific pages
+  if (n === 2) populateSaved();
+  if (n === 1) loadLocationData();
+  if (n === 3 && isAdmin) loadUsers();
+}
+
+// Basic drag & drop
+function allowDrop(ev) {
+  ev.preventDefault();
+}
+
+function drag(ev) {
+  ev.dataTransfer.setData('text', ev.target.id);
+  
+  // Store the type of element being dragged
+  if (ev.target.classList.contains('tile')) {
+    ev.dataTransfer.setData('type', 'tile');
+  } else if (ev.target.classList.contains('column')) {
+    ev.dataTransfer.setData('type', 'column');
+    ev.dataTransfer.setData('columnId', ev.target.id);
+  }
+}
+
+// Modified: Only columns can use this function
+function dragColumn(ev) {
+  // Only allow columns to be dragged as columns
+  if (ev.target.classList.contains('column')) {
+    ev.dataTransfer.setData('type', 'column');
+    ev.dataTransfer.setData('columnId', ev.target.id);
+  }
+}
+
+function findClosestColumn(x) {
+  const columns = Array.from(document.querySelectorAll('#board .column'));
+  
+  // Sort columns by their distance from the drop point
+  columns.sort((a, b) => {
+    const rectA = a.getBoundingClientRect();
+    const rectB = b.getBoundingClientRect();
+    const distA = Math.abs(rectA.left - x);
+    const distB = Math.abs(rectB.left - x);
+    return distA - distB;
+  });
+  
+  // If the drop point is to the right of the closest column, insert after it
+  if (columns.length > 0) {
+    const closest = columns[0];
+    const rect = closest.getBoundingClientRect();
+    
+    if (x > rect.left + rect.width / 2) {
+      return closest.nextElementSibling;
+    } else {
+      return closest;
+    }
+  }
+  
+  return null;
+}
+
+function drop(ev) {
+  ev.preventDefault();
+  const id = ev.dataTransfer.getData('text');
+  const type = ev.dataTransfer.getData('type');
+  const columnId = ev.dataTransfer.getData('columnId');
+  
+  // If this is a column being dragged
+  if (type === 'column') {
+    const column = document.getElementById(columnId);
+    const board = document.getElementById('board');
+    
+    // Find the closest column to determine insertion point
+    const closestColumn = findClosestColumn(ev.clientX);
+    
+    if (closestColumn) {
+      board.insertBefore(column, closestColumn);
+    } else {
+      board.appendChild(column);
+    }
+    
+    autoSave();
+    return;
+  }
+  
+  // Original tile drop code follows
+  const orig = document.getElementById(id);
+  if (!orig) return;
+  
+  // Fix: Only allow tiles to be dropped in columns, resource lists, or permanent boxes
+  // Prevent tiles from being treated like columns
+  if (!orig.classList.contains('tile')) return;
+  
+  const col = ev.target.closest('.column') || ev.target.closest('.resource-list') || ev.target.closest('.permanent-box');
+  if (col) {
+    // Check if this is a combo being dropped into a column
+    if (orig.classList.contains('combo') && (col.closest('.column') || col.closest('.permanent-box'))) {
+      // Break apart the combo into individual resources
+      const resources = JSON.parse(orig.getAttribute('data-resources') || '[]');
+      resources.forEach(resource => {
+        // Create a tile for each resource in the combo
+        const tile = document.createElement('div');
+        tile.className = 'tile ' + resource.type;
+        tile.id = resource.type + '_from_combo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+        tile.draggable = true;
+        tile.ondragstart = drag;
+        
+        const span = document.createElement('span');
+        span.textContent = resource.name;
+        tile.appendChild(span);
+        
+        // Add buttons
+        const btns = document.createElement('div');
+        btns.className = 'tile-buttons';
+        const ret = document.createElement('button');
+        ret.textContent = '↩️';
+        ret.onclick = () => returnTile(tile.id);
+        const del = document.createElement('button');
+        del.textContent = '❌';
+        del.onclick = () => delSiteTile(tile.id);
+        btns.appendChild(ret);
+        btns.appendChild(del);
+        tile.appendChild(btns);
+        
+        col.appendChild(tile);
+      });
+      
+      // Remove the combo tile
+      orig.remove();
+    } else {
+      col.appendChild(orig);
+      
+      // Add buttons if in a column or permanent box
+      if (col.closest('.column') || col.closest('.permanent-box')) {
+        if (!orig.querySelector('.tile-buttons')) {
+          const btns = document.createElement('div');
+          btns.className = 'tile-buttons';
+          const ret = document.createElement('button');
+          ret.textContent = '↩️';
+          ret.onclick = () => returnTile(id);
+          const del = document.createElement('button');
+          del.textContent = '❌';
+          del.onclick = () => delSiteTile(id);
+          btns.appendChild(ret);
+          btns.appendChild(del);
+          orig.appendChild(btns);
+          
+          // Check for permanent combos if this is a crew
+          if (orig.classList.contains('crew')) {
+            checkForPermanentCombos(orig, col);
+          }
+        }
+      } else {
+        // Remove buttons if returned to resource list
+        const btns = orig.querySelector('.tile-buttons');
+        if (btns) btns.remove();
+      }
+    }
+    
+    autoSave();
+  }
+}
+
+function dropLocation(ev, location) {
+  ev.preventDefault();
+  const id = ev.dataTransfer.getData('text');
+  const type = ev.dataTransfer.getData('type');
+  
+  // Fix: Only allow tiles to be dropped in location zones
+  // Prevent tiles from being treated like columns
+  if (type !== 'tile') return;
+  
+  const orig = document.getElementById(id);
+  if (!orig) return;
+  
+  const zone = ev.target.closest('.location-zone');
+  if (zone) {
+    zone.appendChild(orig);
+    
+    // Add location attribute
+    orig.setAttribute('data-location', location);
+    
+    // Add buttons if not already there
+    if (!orig.querySelector('.tile-buttons')) {
+      const btns = document.createElement('div');
+      btns.className = 'tile-buttons';
+      const ret = document.createElement('button');
+      ret.textContent = '↩️';
+      ret.onclick = () => returnTileToResourceList(id);
+      const del = document.createElement('button');
+      del.textContent = '❌';
+      del.onclick = () => delSiteTile(id);
+      btns.appendChild(ret);
+      btns.appendChild(del);
+      orig.appendChild(btns);
+    }
+    
+    // Save location data
+    saveLocationData();
+  }
+}
+
+// Resources
+function addResource(key, textAreaId, listId, type) {
+  const lines = document.getElementById(textAreaId).value.trim().split('\n').map(l=>l.trim()).filter(l=>l);
+  if(!lines.length) return;
+  let arr = JSON.parse(localStorage.getItem(key)||'[]');
+  lines.forEach(name=>{
+    if(!arr.some(item=>item.name===name)) {
+      const id = key+'_'+Date.now()+'_'+Math.random().toString(36).substr(2,5);
+      arr.push({id,name});
+    }
+  });
+  localStorage.setItem(key, JSON.stringify(arr));
+  document.getElementById(textAreaId).value='';
+  render(key, listId, type);
+}
+
+function render(key, listId, type) {
+  const pool = document.getElementById(listId);
+  if (!pool) return;
+  pool.innerHTML='';
+  const arr = JSON.parse(localStorage.getItem(key)||'[]');
+  arr.forEach(item=>{
+    const tile = document.createElement('div');
+    tile.className = 'tile '+type;
+    tile.id = item.id;
+    tile.draggable = true;
+    tile.ondragstart = drag;
+    tile.onclick = toggleSelection;
+    const span = document.createElement('span');
+    span.textContent = item.name;
+    tile.appendChild(span);
+    // Add delete button
+    const del = document.createElement('button');
+    del.textContent = '❌';
+    del.onclick = (e) => { e.stopPropagation(); deleteResource(key, item.id, listId, type); };
+    const btnWrap = document.createElement('div');
+    btnWrap.className = 'tile-buttons';
+    btnWrap.appendChild(del);
+    tile.appendChild(btnWrap);
+    pool.appendChild(tile);
+  });
+}
+
+function addCrew(){ addResource('crews','crewInput','crewList','crew'); }
+function renderCrew(){ render('crews','crewList','crew'); }
+function addTruck(){ addResource('trucks','truckInput','truckList','truck'); }
+function renderTruck(){ render('trucks','truckList','truck'); }
+function addTrailer(){ addResource('trailers','trailerInput','trailerList','trailer'); }
+function renderTrailer(){ render('trailers','trailerList','trailer'); }
+function addEquipment(){ addResource('equipment','equipmentInput','equipmentList','equipment'); }
+function renderEquipment(){ render('equipment','equipmentList','equipment'); }
+
+function renderCombos() {
+  const combos = JSON.parse(localStorage.getItem('combos') || '[]');
+  const comboList = document.getElementById('comboList');
+  
+  if (comboList) {
+    comboList.innerHTML = '';
+    
+    combos.forEach(combo => {
+      const tile = document.createElement('div');
+      tile.className = 'tile combo';
+      tile.id = combo.id;
+      tile.draggable = true;
+      tile.ondragstart = drag;
+      tile.onclick = toggleSelection;
+      
+      const span = document.createElement('span');
+      span.textContent = combo.name;
+      tile.appendChild(span);
+      
+      // Store combo data
+      tile.setAttribute('data-resources', JSON.stringify(combo.resources));
+      
+      comboList.appendChild(tile);
+    });
+  }
+}
+
+function returnTile(id) {
+  const tile = document.getElementById(id);
+  if (!tile) return;
+  
+  // Determine the correct list to return to
+  let listId;
+  if (tile.classList.contains('crew')) listId = 'crewList';
+  else if (tile.classList.contains('truck')) listId = 'truckList';
+  else if (tile.classList.contains('trailer')) listId = 'trailerList';
+  else if (tile.classList.contains('equipment')) listId = 'equipmentList';
+  else if (tile.classList.contains('combo')) listId = 'comboList';
+  else return;
+  
+  const list = document.getElementById(listId);
+  if (list) {
+    list.appendChild(tile);
+    
+    // Remove tile-buttons
+    const btns = tile.querySelector('.tile-buttons');
+    if(btns) btns.remove();
+    
+    autoSave();
+  }
+}
+
+function returnTileToResourceList(id) {
+  const tile = document.getElementById(id);
+  if (!tile) return;
+  
+  // Determine the correct list to return to
+  let listId;
+  if (tile.classList.contains('crew')) listId = 'crewList';
+  else if (tile.classList.contains('truck')) listId = 'truckList';
+  else if (tile.classList.contains('trailer')) listId = 'trailerList';
+  else if (tile.classList.contains('equipment')) listId = 'equipmentList';
+  else if (tile.classList.contains('combo')) listId = 'comboList';
+  else return;
+  
+  const list = document.getElementById(listId);
+  if (list) {
+    list.appendChild(tile);
+    
+    // Remove tile-buttons
+    const btns = tile.querySelector('.tile-buttons');
+    if(btns) btns.remove();
+    
+    saveLocationData();
+  }
+}
+
+function delSiteTile(id) {
+  const tile = document.getElementById(id);
+  if(tile) tile.remove();
+  autoSave();
+  saveLocationData();
+}
+
+// Sites
+let siteCount = 0;
+function addSite() {
+  const name = prompt('Site name:');
+  if(!name) return;
+  const col = document.createElement('div');
+  col.className = 'column';
+  col.id = 'site_' + siteCount++;
+  col.ondragover = allowDrop;
+  col.ondrop = drop;
+  col.onclick = toggleColumnSelection; // Add this line
+  col.draggable = true; // Make column draggable
+  col.ondragstart = dragColumn; // Add drag handler
+  const inp = document.createElement('input');
+  inp.value = name;
+  inp.onclick = (e) => e.stopPropagation(); // Prevent input clicks from selecting column
+  col.appendChild(inp);
+  document.getElementById('board').appendChild(col);
+  autoSave();
+}
+
+function deleteSite() {
+  // Check if any column is selected
+  const selectedColumns = document.querySelectorAll('.column.selected');
+  
+  if (selectedColumns.length === 0) {
+    alert('Please select a site to delete first');
+    return;
+  }
+  
+  // Delete all selected columns
+  selectedColumns.forEach(column => {
+    column.remove();
+  });
+  
+  autoSave();
+}
+
+function clearSites(){
+  document.querySelectorAll('.column').forEach(c=>c.remove());
+  renderAll();
+  autoSave();
+}
+
+function eraseBoard(){
+  localStorage.removeItem('crews');
+  localStorage.removeItem('trucks');
+  localStorage.removeItem('trailers');
+  localStorage.removeItem('equipment');
+  localStorage.removeItem('scheds');
+  localStorage.removeItem('combos');
+  localStorage.removeItem('locations');
+  document.querySelectorAll('.column').forEach(c=>c.remove());
+  renderAll();
+  populateSavedFirst();
+  clearLocationBoard();
+}
+
+// Save/Load
+function autoSave() {
+  // Make sure all input values are reflected in their value attributes before saving
+  document.querySelectorAll('#board .column input').forEach(input => {
+    input.setAttribute('value', input.value);
+  });
+  
+  // Create a container for both board and permanent boxes
+  const saveContainer = document.createElement('div');
+  
+  // Add board content
+  const boardContent = document.createElement('div');
+  boardContent.setAttribute('data-content-type', 'board');
+  boardContent.innerHTML = document.getElementById('board').innerHTML;
+  saveContainer.appendChild(boardContent);
+  
+  // Add permanent boxes content
+  ['off-box', 'available-box', 'shop-box', 'djmuse-box'].forEach(boxId => {
+    const boxContent = document.createElement('div');
+    boxContent.setAttribute('data-content-type', boxId);
+    boxContent.innerHTML = document.getElementById(boxId).innerHTML;
+    saveContainer.appendChild(boxContent);
+  });
+  
+  let scheds = JSON.parse(localStorage.getItem('scheds')||'[]');
+  scheds.unshift({time:new Date().toLocaleString(), html:saveContainer.innerHTML});
+  if (scheds.length > 50) scheds = scheds.slice(0, 50);
+  localStorage.setItem('scheds',JSON.stringify(scheds));
+  populateSavedFirst();
+  populateSaved();
+}
+
+function populateSavedFirst(){
+  const sel = document.getElementById('savedSelectFirst');
+  sel.innerHTML='';
+  JSON.parse(localStorage.getItem('scheds')||'[]').forEach((s,i)=>{
+    sel.append(new Option(s.time,i));
+  });
+}
+
+function populateSaved(){
+  const sel = document.getElementById('savedSelect');
+  sel.innerHTML='';
+  JSON.parse(localStorage.getItem('scheds')||'[]').forEach((s,i)=>{
+    sel.append(new Option(s.time,i));
+  });
+}
+
+function loadSaved() {
+  const selFirst = document.getElementById('savedSelectFirst');
+  const sel = selFirst && selFirst.value!=='' ? selFirst : document.getElementById('savedSelect');
+  const idx = sel.value;
+  const scheds = JSON.parse(localStorage.getItem('scheds')||'[]');
+  
+  if(scheds[idx]) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = scheds[idx].html;
+    
+    // Load board content
+    const boardContent = tmp.querySelector('[data-content-type="board"]');
+    if (boardContent) {
+      document.getElementById('board').innerHTML = boardContent.innerHTML;
+    } else {
+      // Fallback for older saved data
+      document.getElementById('board').innerHTML = scheds[idx].html;
+    }
+    
+    // Load permanent boxes content
+    ['off-box', 'available-box', 'shop-box', 'djmuse-box'].forEach(boxId => {
+      const boxContent = tmp.querySelector(`[data-content-type="${boxId}"]`);
+      if (boxContent) {
+        document.getElementById(boxId).innerHTML = boxContent.innerHTML;
+      }
+    });
+    
+    // Reattach event handlers to loaded elements
+    document.querySelectorAll('#board .column').forEach(col => {
+      col.ondragover = allowDrop;
+      col.ondrop = drop;
+      col.onclick = toggleColumnSelection;
+      col.draggable = true;
+      col.ondragstart = dragColumn;
+    });
+    
+    document.querySelectorAll('#board .tile, .permanent-box .tile').forEach(tile => {
+      tile.draggable = true;
+      tile.ondragstart = drag;
+      
+      // Reattach button event handlers
+      const returnBtn = tile.querySelector('.tile-buttons button:first-child');
+      if (returnBtn) returnBtn.onclick = () => returnTile(tile.id);
+      
+      const delBtn = tile.querySelector('.tile-buttons button:last-child');
+      if (delBtn) delBtn.onclick = () => delSiteTile(tile.id);
+    });
+  }
+}
+
+// Snapshot
+function saveSnapshot(){
+  autoSave();
+  try {
+    html2canvas(document.getElementById('board')).then(canvas=>{
+      const a = document.createElement('a');
+      a.download = 'snapshot_' + new Date().toISOString() + '.png';
+      a.href = canvas.toDataURL();
+      a.click();
+    });
+  } catch (e) {
+    console.error("Error creating snapshot:", e);
+    alert("Error creating snapshot. Please make sure html2canvas is loaded correctly.");
+  }
+}
+
+// Page 2: Saved Schedules functions
+function loadSavedPage2() {
+  const idx = document.getElementById('savedSelect').value;
+  const scheds = JSON.parse(localStorage.getItem('scheds') || '[]');
+  const disp = document.getElementById('savedBoardDisplay');
+  disp.innerHTML = '';
+  
+  if (scheds[idx]) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = scheds[idx].html;
+    
+    // Append all columns side by side
+    tmp.querySelectorAll('.column').forEach(c => {
+      const clone = c.cloneNode(true);
+      
+      // Make sure input values are preserved
+      const origInput = c.querySelector('input');
+      if (origInput) {
+        const cloneInput = clone.querySelector('input');
+        if (cloneInput) {
+          // Explicitly set the value attribute and the value property
+          cloneInput.setAttribute('value', origInput.value);
+          cloneInput.value = origInput.value;
+        }
+      }
+      
+      disp.appendChild(clone);
+    });
+  }
+}
+
+function saveSnapshotPage2() {
+  try {
+    html2canvas(document.getElementById('savedBoardDisplay')).then(canvas => {
+      const a = document.createElement('a');
+      a.download = 'saved_snapshot_' + new Date().toISOString() + '.png';
+      a.href = canvas.toDataURL();
+      a.click();
+    });
+  } catch (e) {
+    console.error("Error creating snapshot:", e);
+    alert("Error creating snapshot. Please make sure html2canvas is loaded correctly.");
+  }
+}
+
+function clearSavedLogs() {
+  localStorage.removeItem('scheds');
+  document.getElementById('savedBoardDisplay').innerHTML = '';
+  populateSaved();
+}
+
+// Combo functionality
+function toggleSelection() {
+  this.classList.toggle('selected');
+}
+
+function toggleColumnSelection(event) {
+  // Only toggle if the click was directly on the column, not on a child element
+  if (event.target === this) {
+    this.classList.toggle('selected');
+  }
+}
+
+function addCombo() {
+  const comboName = document.getElementById('comboName').value.trim();
+  if (!comboName) {
+    alert('Please enter a combo name');
+    return;
+  }
+  
+  // Get selected resources
+  const selectedTiles = document.querySelectorAll('.resource-list .tile.selected');
+  if (selectedTiles.length < 2) {
+    alert('Please select at least 2 resources for the combo');
+    return;
+  }
+  
+  // Create combo
+  const comboId = 'combo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+  
+  // Collect resources in the combo
+  const resources = [];
+  selectedTiles.forEach(tile => {
+    resources.push({
+      id: tile.id,
+      type: Array.from(tile.classList).find(c => c !== 'tile' && c !== 'selected'),
+      name: tile.querySelector('span').textContent
+    });
+    
+    // Remove selection
+    tile.classList.remove('selected');
+    
+    // Remove the tile from resource list
+    tile.remove();
+  });
+  
+  // Save combo
+  let combos = JSON.parse(localStorage.getItem('combos') || '[]');
+  combos.push({
+    id: comboId,
+    name: comboName,
+    resources: resources
+  });
+  localStorage.setItem('combos', JSON.stringify(combos));
+  
+  // Create combo tile
+  const comboTile = document.createElement('div');
+  comboTile.className = 'tile combo';
+  comboTile.id = comboId;
+  comboTile.draggable = true;
+  comboTile.ondragstart = drag;
+  comboTile.onclick = toggleSelection;
+  
+  const span = document.createElement('span');
+  span.textContent = comboName;
+  comboTile.appendChild(span);
+  
+  // Store combo data
+  comboTile.setAttribute('data-resources', JSON.stringify(resources));
+  
+  // Add to combo list
+  document.getElementById('comboList').appendChild(comboTile);
+  
+  // Clear combo name input
+  document.getElementById('comboName').value = '';
+}
+
+function checkForPermanentCombos(crewTile, column) {
+  // Get crew name
+  const crewName = crewTile.querySelector('span').textContent;
+  
+  // Check if this crew has any permanent combos
+  const combos = JSON.parse(localStorage.getItem('combos') || '[]');
+  
+  combos.forEach(combo => {
+    // Check if this combo contains this crew
+    const hasCrew = combo.resources.some(res => 
+      res.type === 'crew' && res.name === crewName
+    );
+    
+    if (hasCrew) {
+      // Add other resources from this combo to the column
+      combo.resources.forEach(res => {
+        if (res.type !== 'crew' || res.name !== crewName) {
+          // Create a tile for this resource
+          const tile = document.createElement('div');
+          tile.className = 'tile ' + res.type;
+          tile.id = res.type + '_combo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+          tile.draggable = true;
+          tile.ondragstart = drag;
+          
+          const span = document.createElement('span');
+          span.textContent = res.name + ' (with ' + crewName + ')';
+          tile.appendChild(span);
+          
+          // Add buttons
+          const btns = document.createElement('div');
+          btns.className = 'tile-buttons';
+          const del = document.createElement('button');
+          del.textContent = '❌';
+          del.onclick = () => delSiteTile(tile.id);
+          btns.appendChild(del);
+          tile.appendChild(btns);
+          
+          column.appendChild(tile);
+        }
+      });
+    }
+  });
+}
+
+// Location functions
+function saveLocationData() {
+  const locations = {
+    KC: [],
+    Indy: [],
+    STL: []
+  };
+  
+  // Collect data from each location zone
+  document.querySelectorAll('.location-zone').forEach(zone => {
+    const location = zone.querySelector('h3').textContent.replace(/[🏙️🏁🌉 ]/g, '').trim();
+    zone.querySelectorAll('.tile').forEach(tile => {
+      locations[location].push({
+        id: tile.id,
+        html: tile.outerHTML
+      });
+    });
+  });
+  
+  localStorage.setItem('locations', JSON.stringify(locations));
+}
+
+function loadLocationData() {
+  const locations = JSON.parse(localStorage.getItem('locations') || '{}');
+  
+  // Clear all zones
+  document.querySelectorAll('.location-zone').forEach(zone => {
+    // Keep only the h3 header
+    const header = zone.querySelector('h3');
+    zone.innerHTML = '';
+    zone.appendChild(header);
+  });
+  
+  // Load data into each zone
+  Object.keys(locations).forEach(location => {
+    let zoneId;
+    if (location === 'KC') zoneId = 'kc-zone';
+    else if (location === 'Indy') zoneId = 'indy-zone';
+    else if (location === 'STL') zoneId = 'stl-zone';
+    else return;
+    
+    const zone = document.getElementById(zoneId);
+    if (!zone) return;
+    
+    locations[location].forEach(item => {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = item.html;
+      const tile = tempDiv.firstChild;
+      
+      // Make sure it's draggable and has event handlers
+      tile.draggable = true;
+      tile.ondragstart = drag;
+      
+      // Reattach button event handlers
+      const returnBtn = tile.querySelector('.tile-buttons button:first-child');
+      if (returnBtn) returnBtn.onclick = () => returnTileToResourceList(item.id);
+      
+      const delBtn = tile.querySelector('.tile-buttons button:last-child');
+      if (delBtn) delBtn.onclick = () => delSiteTile(item.id);
+      
+      zone.appendChild(tile);
+    });
+  });
+}
+
+function clearLocationBoard() {
+  document.querySelectorAll('.location-zone').forEach(zone => {
+    // Keep only the h3 header
+    const header = zone.querySelector('h3');
+    zone.innerHTML = '';
+    zone.appendChild(header);
+  });
+  
+  saveLocationData();
+}
+
+
+function deleteResource(key, id, listId, type) {
+  let arr = JSON.parse(localStorage.getItem(key) || '[]');
+  arr = arr.filter(item => item.id !== id);
+  localStorage.setItem(key, JSON.stringify(arr));
+  render(key, listId, type);
+}
+
+function clearResource(key, listId, type) {
+  if (confirm('Clear all ' + key + '?')) {
+    localStorage.removeItem(key);
+    render(key, listId, type);
+  }
+}
+
+function clearCrew() { clearResource('crews','crewList','crew'); }
+function clearTruck() { clearResource('trucks','truckList','truck'); }
+function clearTrailer() { clearResource('trailers','trailerList','trailer'); }
+function clearEquipment() { clearResource('equipment','equipmentList','equipment'); }
+
+function renderAll(){
+  renderCrew();
+  renderTruck();
+  renderTrailer();
+  renderEquipment();
+  renderCombos();
+}
+
+// Touch support for mobile devices
+function initTouchSupport() {
+  // Add touch event listeners for drag and drop on mobile
+  let touchDragSource = null;
+  
+  document.addEventListener('touchstart', function(e) {
+    if (e.target.classList.contains('tile')) {
+      touchDragSource = e.target;
+      e.target.classList.add('dragging');
+    }
+  }, { passive: false });
+  
+  document.addEventListener('touchend', function(e) {
+    if (touchDragSource) {
+      touchDragSource.classList.remove('dragging');
+      
+      // Find the drop target
+      const touch = e.changedTouches[0];
+      const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+      
+      if (dropTarget) {
+        const col = dropTarget.closest('.column') || 
+                   dropTarget.closest('.resource-list') || 
+                   dropTarget.closest('.permanent-box') ||
+                   dropTarget.closest('.location-zone');
+        
+        if (col) {
+          // Handle drop based on target type
+          if (col.classList.contains('location-zone')) {
+            const locationName = col.querySelector('h3').textContent.replace(/[🏙️🏁🌉 ]/g, '').trim();
+            
+            // Create a synthetic event for dropLocation
+            const syntheticEvent = {
+              preventDefault: () => {},
+              dataTransfer: {
+                getData: (type) => type === 'text' ? touchDragSource.id : 'tile'
+              },
+              target: dropTarget,
+              clientX: touch.clientX,
+              clientY: touch.clientY
+            };
+            
+            dropLocation(syntheticEvent, locationName);
+          } else {
+            // Create a synthetic event for drop
+            const syntheticEvent = {
+              preventDefault: () => {},
+              dataTransfer: {
+                getData: (type) => {
+                  if (type === 'text') return touchDragSource.id;
+                  if (type === 'type') return 'tile';
+                  return '';
+                },
+                setData: () => {}
+              },
+              target: dropTarget,
+              clientX: touch.clientX,
+              clientY: touch.clientY
+            };
+            
+            drop(syntheticEvent);
+          }
+        }
+      }
+      
+      touchDragSource = null;
+    }
+  }, { passive: false });
+  
+  document.addEventListener('touchmove', function(e) {
+    if (touchDragSource) {
+      e.preventDefault(); // Prevent scrolling while dragging
+      
+      const touch = e.touches[0];
+      const dropIndicator = document.getElementById('touch-drop-indicator') || 
+                           createDropIndicator();
+      
+      dropIndicator.style.left = (touch.clientX - 20) + 'px';
+      dropIndicator.style.top = (touch.clientY - 20) + 'px';
+      dropIndicator.style.display = 'block';
+    }
+  }, { passive: false });
+  
+  function createDropIndicator() {
+    const indicator = document.createElement('div');
+    indicator.id = 'touch-drop-indicator';
+    indicator.style.position = 'fixed';
+    indicator.style.width = '40px';
+    indicator.style.height = '40px';
+    indicator.style.borderRadius = '50%';
+    indicator.style.backgroundColor = 'rgba(209, 163, 255, 0.5)';
+    indicator.style.pointerEvents = 'none';
+    indicator.style.zIndex = '9999';
+    document.body.appendChild(indicator);
+    return indicator;
+  }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Don't auto-render until login
+  // renderAll();
+  // populateSavedFirst();
+  // populateSaved();
+  // loadLocationData();
+  
+  // Make all resource tiles selectable for combos
+  document.querySelectorAll('.resource-list .tile').forEach(tile => {
+    tile.onclick = toggleSelection;
+  });
+  
+  // Set up login form submission
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    attemptLogin();
+  });
+  
+  // Initialize touch support for mobile devices
+  initTouchSupport();
+});
+</script>
+
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+  <!-- Cloud sync injection -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="/js/cloud.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://ldbjgdfkjnpxwvrofmkx.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkYmpnZGZram5weHd2cm9mbWt4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4OTMwMTYsImV4cCI6MjA3MDQ2OTAxNn0.2DeJq25bo_3nKG_PhkWaUUssVjUqQSRqsoeo8zZ4dFg";
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  
+  async function signIn(email, password) {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+    if (error) {
+      console.error(error);
+      alert('Login failed');
+    } else {
+      console.log('Logged in:', data);
+      alert('Login successful');
+      // TODO: Load saved schedules from Supabase table
+    }
+  }
+</script>
+
+</body>
+</html>
