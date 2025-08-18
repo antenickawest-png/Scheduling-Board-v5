@@ -1,7 +1,7 @@
-# netlify.toml
+# netlify.toml  (root of repo)
 [build]
-  command = "npm run build"
-  publish = ".next"            # for server-rendered Next on Netlify
+  command = "pnpm build"
+  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "22.18.0"
