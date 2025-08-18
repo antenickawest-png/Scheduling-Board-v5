@@ -1,47 +1,52 @@
-'use client';
+"use client"
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-// If "@/supabase" doesn't work in your project, change to: "../../../supabase"
-import { supabase } from '@/supabase';
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { supabase } from "../../../supabase"
 
 export default function AuthCallback() {
-  const router = useRouter();
+  const router = useRouter()
 
   useEffect(() => {
-    const run = async () => {
+    const handleAuthCallback = async () => {
       try {
-        // 1) Handle hash tokens:  #access_token=...&refresh_token=...
-        const hash = window.location.hash.replace(/^#/, '');
-        const hashParams = new URLSearchParams(hash);
-        const access_token = hashParams.get('access_token');
-        const refresh_token = hashParams.get('refresh_token');
+        const hash = typeof window !== "undefined" ? window.location.hash.replace(/^#/, "") : ""
+        const hashParams = new URLSearchParams(hash)
+        const access_token = hashParams.get("access_token")
+        const refresh_token = hashParams.get("refresh_token")
 
         if (access_token && refresh_token) {
-          await supabase.auth.setSession({ access_token, refresh_token });
-          router.replace('/'); // or '/dashboard'
-          return;
+          await supabase.auth.setSession({ access_token, refresh_token })
+          router.replace("/")
+          return
         }
 
-        // 2) Handle PKCE code:  ?code=...
-        const searchParams = new URLSearchParams(window.location.search);
-        const code = searchParams.get('code');
+        // Handle PKCE code from email confirmations
+        const searchParams = new URLSearchParams(window.location.search)
+        const code = searchParams.get("code")
         if (code) {
-          await supabase.auth.exchangeCodeForSession(code);
-          router.replace('/'); // or '/dashboard'
-          return;
+          await supabase.auth.exchangeCodeForSession(code)
+          router.replace("/")
+          return
         }
 
-        // Nothing to process → go home
-        router.replace('/');
+        // No auth data found, redirect to home
+        router.replace("/")
       } catch (err) {
-        console.error('Auth callback error:', err);
-        router.replace('/login'); // optional
+        console.error("Auth callback error:", err)
+        router.replace("/")
       }
-    };
+    }
 
-    run();
-  }, [router]);
+    handleAuthCallback()
+  }, [router])
 
-  return <p>Loading...</p>;
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-purple-50">
+      <div className="text-center">
+        <div className="text-lg text-purple-600 mb-2">🔄 Completing sign in...</div>
+        <div className="text-sm text-gray-600">Please wait while we redirect you.</div>
+      </div>
+    </div>
+  )
 }
