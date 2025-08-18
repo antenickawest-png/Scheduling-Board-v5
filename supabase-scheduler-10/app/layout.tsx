@@ -1,21 +1,18 @@
-import type React from "react"
-import { AuthProvider } from "../hooks/use-auth"
-import "./globals.css"
+import type { Metadata } from 'next';
+import './globals.css';
+import { AuthProvider } from '../hooks/use-auth';
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export const metadata: Metadata = {
+  title: 'R&S Scheduling',
+  generator: 'v0.app',
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className="antialiased">
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
-  )
+  );
 }
-
-export const metadata = {
-      generator: 'v0.app'
-    };
