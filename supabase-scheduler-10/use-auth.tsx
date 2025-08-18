@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { createContext, useContext, useEffect, useState } from "react"
 import type { User } from "@supabase/supabase-js"
 import { supabase } from "../supabase"
@@ -51,6 +50,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (session?.user) {
           await fetchProfile(session.user.id)
         } else {
+          console.log("[v0] No session, setting loading to false")
+          setProfile(null)
           setLoading(false)
         }
       } catch (error) {
@@ -70,6 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session?.user) {
         await fetchProfile(session.user.id)
       } else {
+        console.log("[v0] Auth state change: no session, setting loading to false")
         setProfile(null)
         setLoading(false)
       }
