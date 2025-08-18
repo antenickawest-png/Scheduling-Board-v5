@@ -1,9 +1,10 @@
+# netlify.toml
 [build]
   command = "npm run build"
-  publish = "out"
+  publish = ".next"            # for server-rendered Next on Netlify
+
+[build.environment]
+  NODE_VERSION = "22.18.0"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-[build.environment]
-  NODE_VERSION = "18"
