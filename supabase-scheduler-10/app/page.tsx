@@ -1,21 +1,20 @@
 "use client"
 
-import { useEffect, useState } from "react" // Add this import
+import { useEffect, useState } from "react"
 import { useAuth } from "../hooks/use-auth"
 import LoginForm from "../components/login-form"
+import { ScheduleBoard } from "../components/schedule-board" // Add this import
 
 export default function Home() {
-  const { user, loading, signOut } = useAuth() // Add signOut to destructuring
-  const [mounted, setMounted] = useState(false) // Add this state
+  const { user, loading, signOut } = useAuth()
+  const [mounted, setMounted] = useState(false)
 
-  // Add this effect for client-side hydration
   useEffect(() => {
     setMounted(true)
   }, [])
 
   console.log("[v0] Page component - loading:", loading, "user:", user ? "exists" : "null", "mounted:", mounted)
 
-  // Add this check before loading check
   if (!mounted) {
     return null
   }
@@ -43,9 +42,11 @@ export default function Home() {
   }
 
   console.log("[v0] Page showing main app")
+  
+  // REPLACE THIS ENTIRE BLOCK:
+  /*
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
-      {/* Add sign out button in a flex container with the title */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
         <h1 style={{ color: "#7c3aed", margin: 0 }}>🚀 R&S Tower Service Scheduling</h1>
         <button
@@ -103,4 +104,8 @@ export default function Home() {
       </div>
     </div>
   )
+  */
+  
+  // WITH THIS SINGLE LINE:
+  return <ScheduleBoard />
 }
