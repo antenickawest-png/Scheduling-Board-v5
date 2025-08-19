@@ -1,3 +1,19 @@
+// At the top of your ScheduleBoard component function
+console.log("[DEBUG] ScheduleBoard component rendering - user:", user?.id, "profile:", profile?.username)
+
+// Add error boundary
+try {
+  // Rest of your component code
+} catch (error) {
+  console.error("[DEBUG] Error rendering ScheduleBoard:", error)
+  return (
+    <div style={{ padding: "20px", color: "red" }}>
+      <h1>Error rendering ScheduleBoard</h1>
+      <p>{error.message}</p>
+    </div>
+  )
+}
+
 "use client"
 
 import { useEffect, useState, useRef } from "react"
