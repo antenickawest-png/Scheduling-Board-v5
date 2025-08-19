@@ -1,12 +1,24 @@
 "use client"
 
+import { useEffect, useState } from "react" // Add this import
 import { useAuth } from "../hooks/use-auth"
 import LoginForm from "../components/login-form"
 
 export default function Home() {
-  const { user, loading } = useAuth()
+  const { user, loading, signOut } = useAuth() // Add signOut to destructuring
+  const [mounted, setMounted] = useState(false) // Add this state
 
-  console.log("[v0] Page component - loading:", loading, "user:", user ? "exists" : "null")
+  // Add this effect for client-side hydration
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  console.log("[v0] Page component - loading:", loading, "user:", user ? "exists" : "null", "mounted:", mounted)
+
+  // Add this check before loading check
+  if (!mounted) {
+    return null
+  }
 
   if (loading) {
     console.log("[v0] Page showing loading screen")
@@ -33,7 +45,22 @@ export default function Home() {
   console.log("[v0] Page showing main app")
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
-      <h1 style={{ color: "#7c3aed", marginBottom: "20px" }}>🚀 R&S Tower Service Scheduling</h1>
+      {/* Add sign out button in a flex container with the title */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+        <h1 style={{ color: "#7c3aed", margin: 0 }}>🚀 R&S Tower Service Scheduling</h1>
+        <button
+          onClick={() => signOut()}
+          style={{
+            backgroundColor: "#7c3aed",
+            color: "white",
+            padding: "8px 16px",
+            border: "none",
+            borderRadius: "5px",
+          }}
+        >
+          Sign Out
+        </button>
+      </div>
 
       <div style={{ marginBottom: "20px" }}>
         <h2>📅 Weekly Sites & Resources</h2>
