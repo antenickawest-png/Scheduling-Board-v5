@@ -1,16 +1,20 @@
 [build]
   base = "supabase-scheduler-10"
   command = "npm run build"
-  publish = ".next"
+  publish = "out"  # Changed from .next to out since you're using output: 'export'
 
 [build.environment]
   NODE_VERSION = "22.18.0"
   NEXT_PUBLIC_SITE_URL = "https://msweeklyboard.com"
+  # Add this to disable SSR for the Next.js plugin
+  NEXT_USE_NETLIFY_EDGE = "false"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+  [plugins.inputs]
+    # Add this to disable SSR
+    staticExport = true
 
-# Add this redirect rule to handle client-side routing
 [[redirects]]
   from = "/*"
   to = "/index.html"
