@@ -1,20 +1,23 @@
-// At the top of your ScheduleBoard component function
-console.log("[DEBUG] ScheduleBoard component rendering - user:", user?.id, "profile:", profile?.username)
-
-// Add error boundary
-try {
-  // Rest of your component code
-} catch (error) {
-  console.error("[DEBUG] Error rendering ScheduleBoard:", error)
-  return (
-    <div style={{ padding: "20px", color: "red" }}>
-      <h1>Error rendering ScheduleBoard</h1>
-      <p>{error.message}</p>
-    </div>
-  )
-}
 
 "use client"
+
+useEffect(() => {
+  console.log("[DEBUG] useEffect for resources and sync running")
+  if (user) {
+    try {
+      console.log("[DEBUG] Loading resources")
+      loadResources()
+      console.log("[DEBUG] Loading schedules")
+      loadSchedules()
+      // Comment out this line temporarily
+      // console.log("[DEBUG] Syncing from Supabase")
+      // syncFromSupabase()
+      console.log("[DEBUG] Resources and sync complete")
+    } catch (error) {
+      console.error("[DEBUG] Error in resources/sync useEffect:", error)
+    }
+  }
+}, [user])
 
 import { useEffect, useState, useRef } from "react"
 import { useAuth } from "../hooks/use-auth"
