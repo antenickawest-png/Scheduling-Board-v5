@@ -3,24 +3,39 @@
 import { useEffect, useState } from "react"
 import { useAuth } from "../hooks/use-auth"
 import LoginForm from "../components/login-form"
-import { ScheduleBoard } from "../components/schedule-board" // Add this import
+import { ScheduleBoard } from "../components/schedule-board"
 
 export default function Home() {
   const { user, loading, signOut } = useAuth()
   const [mounted, setMounted] = useState(false)
+  const [loadingTimeout, setLoadingTimeout] = useState(false)
 
+  // Add this effect for client-side hydration
   useEffect(() => {
+    console.log("[DEBUG] Component mounted effect running")
     setMounted(true)
+    
+    // Add a timeout to bypass loading if it takes too long
+    const timer = setTimeout(() => {
+      console.log("[DEBUG] Loading timeout reached, forcing render")
+      setLoadingTimeout(true)
+    }, 5000) // 5 seconds timeout
+    
+    return () => clearTimeout(timer)
   }, [])
 
-  console.log("[v0] Page component - loading:", loading, "user:", user ? "exists" : "null", "mounted:", mounted)
+  // Log every render
+  console.log("[DEBUG] Page rendering - loading:", loading, "user:", user ? "exists" : "null", "mounted:", mounted, "loadingTimeout:", loadingTimeout)
 
+  // Don't render anything until client-side hydration is complete
   if (!mounted) {
+    console.log("[DEBUG] Not mounted yet, returning null")
     return null
   }
 
-  if (loading) {
-    console.log("[v0] Page showing loading screen")
+  // If loading takes too long, show the original UI
+  if (loading && !loadingTimeout) {
+    console.log("[DEBUG] Still loading, showing loading screen")
     return (
       <div
         style={{
@@ -31,26 +46,31 @@ export default function Home() {
           fontFamily: "Arial, sans-serif",
         }}
       >
-        Loading...
+        <div>
+          <p>Loading...</p>
+          <p style={{ fontSize: "12px", color: "#666" }}>
+            (If this takes too long, the page will continue in a few seconds)
+          </p>
+        </div>
       </div>
     )
   }
 
-  if (!user) {
-    console.log("[v0] Page showing login form")
+  // If no user and not loading, or loading timed out without a user
+  if ((!loading || loadingTimeout) && !user) {
+    console.log("[DEBUG] No user, showing login form")
     return <LoginForm />
   }
 
-  console.log("[v0] Page showing main app")
+  console.log("[DEBUG] User authenticated or loading timed out, showing main UI")
   
-  // REPLACE THIS ENTIRE BLOCK:
-  /*
+  // If we have a user or loading timed out, show the original UI
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
         <h1 style={{ color: "#7c3aed", margin: 0 }}>🚀 R&S Tower Service Scheduling</h1>
         <button
-          onClick={() => signOut()}
+          onClick={() => signOut ? signOut() : null}
           style={{
             backgroundColor: "#7c3aed",
             color: "white",
@@ -104,8 +124,5 @@ export default function Home() {
       </div>
     </div>
   )
-  */
-  
-  // WITH THIS SINGLE LINE:
-  return <ScheduleBoard />
 }
+
