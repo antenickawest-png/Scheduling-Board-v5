@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useAuth } from "../hooks/use-auth"
 import { useSync } from "../hooks/use-sync"
 import { supabase } from "../supabase"
@@ -11,12 +11,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 type Resource = {
   id: string
   name: string
+  type?: string
+}
+
+type Column = {
+  id: string
+  name: string
+  items: Resource[]
 }
 
 type BoardData = {
-  columns: any[]
-  permanentBoxes: any
-  locations: any
+  columns: Column[]
+  permanentBoxes: {
+    [key: string]: Resource[]
+  }
+  locations: {
+    [key: string]: Resource[]
+  }
 }
 
 export function ScheduleBoard() {
@@ -30,9 +41,22 @@ export function ScheduleBoard() {
   const [schedules, setSchedules] = useState<any[]>([])
   const [boardData, setBoardData] = useState<BoardData>({
     columns: [],
-    permanentBoxes: {},
-    locations: {},
+    permanentBoxes: {
+      "off-box": [],
+      "available-box": [],
+      "shop-box": [],
+      "djmuse-box": []
+    },
+    locations: {
+      "kc-zone": [],
+      "indy-zone": [],
+      "stl-zone": []
+    }
   })
+  const [draggedItem, setDraggedItem] = useState<Resource | null>(null)
+  const [selectedItems, setSelectedItems] = useState<string[]>([])
+  const [comboName, setComboName] = useState("")
+  const [showComboControls, setShowComboControls] = useState(false)
 
   useEffect(() => {
     if (user) {
@@ -47,8 +71,17 @@ export function ScheduleBoard() {
       const { boardData: syncedBoardData, permanentBoxesData, locationData } = event.detail
       setBoardData({
         columns: syncedBoardData?.columns || [],
-        permanentBoxes: permanentBoxesData || {},
-        locations: locationData || {},
+        permanentBoxes: permanentBoxesData || {
+          "off-box": [],
+          "available-box": [],
+          "shop-box": [],
+          "djmuse-box": []
+        },
+        locations: locationData || {
+          "kc-zone": [],
+          "indy-zone": [],
+          "stl-zone": []
+        }
       })
     }
 
@@ -65,10 +98,10 @@ export function ScheduleBoard() {
         supabase.from("equipment").select("*").order("name"),
       ])
 
-      if (crewsRes.data) setCrews(crewsRes.data)
-      if (trucksRes.data) setTrucks(trucksRes.data)
-      if (trailersRes.data) setTrailers(trailersRes.data)
-      if (equipmentRes.data) setEquipment(equipmentRes.data)
+      if (crewsRes.data) setCrews(crewsRes.data.map(c => ({ ...c, type: 'crew' })))
+      if (trucksRes.data) setTrucks(trucksRes.data.map(t => ({ ...t, type: 'truck' })))
+      if (trailersRes.data) setTrailers(trailersRes.data.map(t => ({ ...t, type: 'trailer' })))
+      if (equipmentRes.data) setEquipment(equipmentRes.data.map(e => ({ ...e, type: 'equipment' })))
     } catch (error) {
       console.error("[v0] Error loading resources:", error)
     }
@@ -94,13 +127,138 @@ export function ScheduleBoard() {
       if (error) throw error
 
       // Update local state
-      const setter =
-        type === "crews" ? setCrews : type === "trucks" ? setTrucks : type === "trailers" ? setTrailers : setEquipment
-
-      setter((prev) => [...prev, data])
+      const resourceWithType = { ...data, type: type.slice(0, -1) }
+      
+      if (type === "crews") {
+        setCrews(prev => [...prev, resourceWithType])
+      } else if (type === "trucks") {
+        setTrucks(prev => [...prev, resourceWithType])
+      } else if (type === "trailers") {
+        setTrailers(prev => [...prev, resourceWithType])
+      } else if (type === "equipment") {
+        setEquipment(prev => [...prev, resourceWithType])
+      }
     } catch (error) {
       console.error(`[v0] Error adding ${type}:`, error)
     }
+  }
+
+  const handleDragStart = (item: Resource) => {
+    setDraggedItem(item)
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+  }
+
+  const handleDrop = (destination: string, columnIndex?: number) => {
+    if (!draggedItem) return
+
+    // Create a copy of the current board data
+    const newBoardData = { ...boardData }
+
+    // Handle drop based on destination
+    if (destination === 'board' && typeof columnIndex === 'number') {
+      // Ensure column exists
+      if (!newBoardData.columns[columnIndex]) {
+        newBoardData.columns[columnIndex] = {
+          id: `column_${Date.now()}`,
+          name: `Site ${columnIndex + 1}`,
+          items: []
+        }
+      }
+      
+      // Add item to column
+      newBoardData.columns[columnIndex].items.push(draggedItem)
+    } else if (destination.startsWith('permanent-')) {
+      const boxKey = destination.replace('permanent-', '')
+      if (newBoardData.permanentBoxes[boxKey]) {
+        newBoardData.permanentBoxes[boxKey].push(draggedItem)
+      }
+    } else if (destination.startsWith('location-')) {
+      const zoneKey = destination.replace('location-', '')
+      if (newBoardData.locations[zoneKey]) {
+        newBoardData.locations[zoneKey].push(draggedItem)
+      }
+    }
+
+    // Update board data
+    setBoardData(newBoardData)
+    setDraggedItem(null)
+    
+    // Sync to Supabase if admin
+    if (isAdmin) {
+      syncToSupabase(newBoardData.columns, newBoardData.permanentBoxes, newBoardData.locations)
+    }
+  }
+
+  const addSite = () => {
+    if (!isAdmin) return
+    
+    const siteName = prompt('Enter site name:')
+    if (!siteName) return
+    
+    const newBoardData = { ...boardData }
+    newBoardData.columns.push({
+      id: `site_${Date.now()}`,
+      name: siteName,
+      items: []
+    })
+    
+    setBoardData(newBoardData)
+    
+    // Sync to Supabase
+    syncToSupabase(newBoardData.columns, newBoardData.permanentBoxes, newBoardData.locations)
+  }
+
+  const deleteSite = () => {
+    if (!isAdmin) return
+    
+    const siteIndex = parseInt(prompt('Enter site index to delete (0-based):') || '-1')
+    if (siteIndex < 0 || siteIndex >= boardData.columns.length) return
+    
+    const newBoardData = { ...boardData }
+    newBoardData.columns.splice(siteIndex, 1)
+    
+    setBoardData(newBoardData)
+    
+    // Sync to Supabase
+    syncToSupabase(newBoardData.columns, newBoardData.permanentBoxes, newBoardData.locations)
+  }
+
+  const clearBoard = () => {
+    if (!isAdmin) return
+    
+    if (!confirm('Are you sure you want to clear the board?')) return
+    
+    const newBoardData = { ...boardData }
+    newBoardData.columns = []
+    
+    setBoardData(newBoardData)
+    
+    // Sync to Supabase
+    syncToSupabase(newBoardData.columns, newBoardData.permanentBoxes, newBoardData.locations)
+  }
+
+  const toggleItemSelection = (item: Resource) => {
+    setSelectedItems(prev => {
+      if (prev.includes(item.id)) {
+        return prev.filter(id => id !== item.id)
+      } else {
+        return [...prev, item.id]
+      }
+    })
+  }
+
+  const addCombo = () => {
+    if (!isAdmin || !comboName || selectedItems.length < 2) return
+    
+    // Create combo logic would go here
+    alert(`Created combo "${comboName}" with ${selectedItems.length} items`)
+    
+    // Clear selection
+    setComboName("")
+    setSelectedItems([])
   }
 
   const handleSyncNow = () => {
@@ -110,13 +268,7 @@ export function ScheduleBoard() {
   const handleSaveBoard = async () => {
     if (!isAdmin) return
 
-    // Get current board state from DOM (simplified for demo)
-    const currentBoardData = {
-      columns: [], // Would extract from DOM
-      timestamp: new Date().toISOString(),
-    }
-
-    await syncToSupabase(currentBoardData, {}, {})
+    await syncToSupabase(boardData.columns, boardData.permanentBoxes, boardData.locations)
   }
 
   if (!user || !profile) {
@@ -186,12 +338,30 @@ export function ScheduleBoard() {
 
             {/* Controls */}
             {isAdmin && (
-              <div className="flex gap-2 mb-6">
-                <Button onClick={() => {}}>➕ Add Site</Button>
-                <Button onClick={() => {}}>🗑️ Delete Site</Button>
-                <Button onClick={() => {}}>🧹 Clear Board</Button>
+              <div className="flex gap-2 mb-6 bg-purple-100 p-3 rounded-lg overflow-x-auto">
+                <Button onClick={addSite}>➕ Add Site</Button>
+                <Button onClick={deleteSite}>🗑️ Delete Site</Button>
+                <Button onClick={clearBoard}>🧹 Clear Board</Button>
                 <Button onClick={handleSaveBoard}>💾 Auto-Save</Button>
-                <Button onClick={() => {}}>🔄 Add Combo</Button>
+                <Button onClick={() => setShowComboControls(!showComboControls)}>
+                  {showComboControls ? "❌ Hide Combo" : "🔄 Show Combo"}
+                </Button>
+              </div>
+            )}
+
+            {/* Combo Controls */}
+            {isAdmin && showComboControls && (
+              <div className="flex gap-2 mb-6 bg-purple-100 p-3 rounded-lg">
+                <Input
+                  value={comboName}
+                  onChange={(e) => setComboName(e.target.value)}
+                  placeholder="Combo Name"
+                  className="max-w-xs"
+                />
+                <Button onClick={addCombo}>🔄 Add Combo</Button>
+                <span className="text-sm text-purple-700 self-center">
+                  {selectedItems.length} items selected
+                </span>
               </div>
             )}
 
@@ -202,40 +372,151 @@ export function ScheduleBoard() {
                 resources={crews}
                 onAdd={(name) => addResource("crews", name)}
                 canEdit={isAdmin}
+                onDragStart={handleDragStart}
+                selectedItems={selectedItems}
+                onToggleSelection={toggleItemSelection}
               />
               <ResourceSection
                 title="🚚 Trucks"
                 resources={trucks}
                 onAdd={(name) => addResource("trucks", name)}
                 canEdit={isAdmin}
+                onDragStart={handleDragStart}
+                selectedItems={selectedItems}
+                onToggleSelection={toggleItemSelection}
               />
               <ResourceSection
                 title="🚛 Trailers"
                 resources={trailers}
                 onAdd={(name) => addResource("trailers", name)}
                 canEdit={isAdmin}
+                onDragStart={handleDragStart}
+                selectedItems={selectedItems}
+                onToggleSelection={toggleItemSelection}
               />
               <ResourceSection
                 title="🔧 Equipment"
                 resources={equipment}
                 onAdd={(name) => addResource("equipment", name)}
                 canEdit={isAdmin}
+                onDragStart={handleDragStart}
+                selectedItems={selectedItems}
+                onToggleSelection={toggleItemSelection}
               />
             </div>
 
             {/* Board Area */}
-            <div className="bg-white rounded-lg p-4 min-h-96 border-2 border-dashed border-purple-200">
-              <p className="text-center text-purple-600">📋 Drag and drop scheduling board will be implemented here</p>
+            <div 
+              className="flex gap-4 overflow-x-auto p-4 min-h-64 bg-purple-50 border-t border-purple-200 rounded-lg mb-6"
+              onDragOver={handleDragOver}
+            >
+              {boardData.columns.map((column, index) => (
+                <div 
+                  key={column.id}
+                  className="bg-white rounded-lg p-3 min-w-48 border-2 border-purple-200 flex-shrink-0"
+                  onDragOver={handleDragOver}
+                  onDrop={() => handleDrop('board', index)}
+                >
+                  <Input 
+                    value={column.name} 
+                    onChange={(e) => {
+                      const newBoardData = { ...boardData }
+                      newBoardData.columns[index].name = e.target.value
+                      setBoardData(newBoardData)
+                    }}
+                    className="mb-2 font-bold text-center"
+                    readOnly={!isAdmin}
+                  />
+                  <div className="space-y-2">
+                    {column.items.map((item, itemIndex) => (
+                      <div 
+                        key={`${item.id}_${itemIndex}`}
+                        className={`p-2 rounded text-sm flex justify-between items-center ${
+                          item.type === 'crew' ? 'bg-purple-200' :
+                          item.type === 'truck' ? 'bg-purple-100' :
+                          item.type === 'trailer' ? 'bg-green-100' :
+                          'bg-yellow-100'
+                        }`}
+                      >
+                        <span>{item.name}</span>
+                        {isAdmin && (
+                          <div className="flex gap-1">
+                            <button 
+                              className="text-xs opacity-70 hover:opacity-100"
+                              onClick={() => {
+                                const newBoardData = { ...boardData }
+                                newBoardData.columns[index].items.splice(itemIndex, 1)
+                                setBoardData(newBoardData)
+                              }}
+                            >
+                              ❌
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+              {boardData.columns.length === 0 && (
+                <div className="w-full text-center text-purple-400 py-10">
+                  No sites added yet. Click "Add Site" to create one.
+                </div>
+              )}
             </div>
 
             {/* Status Boxes */}
             <div className="mt-6">
               <h3 className="text-lg font-bold mb-4">📊 Status Zones</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <StatusBox title="🏠 Off" />
-                <StatusBox title="✅ Available" />
-                <StatusBox title="🔧 Shop/Logistics" />
-                <StatusBox title="🏢 DJM Use" />
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <StatusBox 
+                  title="🏠 Off" 
+                  items={boardData.permanentBoxes["off-box"]} 
+                  onDragOver={handleDragOver}
+                  onDrop={() => handleDrop('permanent-off-box')}
+                  isAdmin={isAdmin}
+                  onRemoveItem={(index) => {
+                    const newBoardData = { ...boardData }
+                    newBoardData.permanentBoxes["off-box"].splice(index, 1)
+                    setBoardData(newBoardData)
+                  }}
+                />
+                <StatusBox 
+                  title="✅ Available" 
+                  items={boardData.permanentBoxes["available-box"]}
+                  onDragOver={handleDragOver}
+                  onDrop={() => handleDrop('permanent-available-box')}
+                  isAdmin={isAdmin}
+                  onRemoveItem={(index) => {
+                    const newBoardData = { ...boardData }
+                    newBoardData.permanentBoxes["available-box"].splice(index, 1)
+                    setBoardData(newBoardData)
+                  }}
+                />
+                <StatusBox 
+                  title="🔧 Shop/Logistics" 
+                  items={boardData.permanentBoxes["shop-box"]}
+                  onDragOver={handleDragOver}
+                  onDrop={() => handleDrop('permanent-shop-box')}
+                  isAdmin={isAdmin}
+                  onRemoveItem={(index) => {
+                    const newBoardData = { ...boardData }
+                    newBoardData.permanentBoxes["shop-box"].splice(index, 1)
+                    setBoardData(newBoardData)
+                  }}
+                />
+                <StatusBox 
+                  title="🏢 DJM Use" 
+                  items={boardData.permanentBoxes["djmuse-box"]}
+                  onDragOver={handleDragOver}
+                  onDrop={() => handleDrop('permanent-djmuse-box')}
+                  isAdmin={isAdmin}
+                  onRemoveItem={(index) => {
+                    const newBoardData = { ...boardData }
+                    newBoardData.permanentBoxes["djmuse-box"].splice(index, 1)
+                    setBoardData(newBoardData)
+                  }}
+                />
               </div>
             </div>
 
@@ -243,9 +524,42 @@ export function ScheduleBoard() {
             <div className="mt-6">
               <h3 className="text-lg font-bold mb-4">📍 Locations</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <LocationZone title="🏙️ KC" />
-                <LocationZone title="🏁 Indy" />
-                <LocationZone title="🌉 STL" />
+                <LocationZone 
+                  title="🏙️ KC" 
+                  items={boardData.locations["kc-zone"]}
+                  onDragOver={handleDragOver}
+                  onDrop={() => handleDrop('location-kc-zone')}
+                  isAdmin={isAdmin}
+                  onRemoveItem={(index) => {
+                    const newBoardData = { ...boardData }
+                    newBoardData.locations["kc-zone"].splice(index, 1)
+                    setBoardData(newBoardData)
+                  }}
+                />
+                <LocationZone 
+                  title="🏁 Indy" 
+                  items={boardData.locations["indy-zone"]}
+                  onDragOver={handleDragOver}
+                  onDrop={() => handleDrop('location-indy-zone')}
+                  isAdmin={isAdmin}
+                  onRemoveItem={(index) => {
+                    const newBoardData = { ...boardData }
+                    newBoardData.locations["indy-zone"].splice(index, 1)
+                    setBoardData(newBoardData)
+                  }}
+                />
+                <LocationZone 
+                  title="🌉 STL" 
+                  items={boardData.locations["stl-zone"]}
+                  onDragOver={handleDragOver}
+                  onDrop={() => handleDrop('location-stl-zone')}
+                  isAdmin={isAdmin}
+                  onRemoveItem={(index) => {
+                    const newBoardData = { ...boardData }
+                    newBoardData.locations["stl-zone"].splice(index, 1)
+                    setBoardData(newBoardData)
+                  }}
+                />
               </div>
             </div>
           </div>
@@ -289,11 +603,17 @@ function ResourceSection({
   resources,
   onAdd,
   canEdit,
+  onDragStart,
+  selectedItems,
+  onToggleSelection
 }: {
   title: string
   resources: Resource[]
   onAdd: (name: string) => void
   canEdit: boolean
+  onDragStart: (item: Resource) => void
+  selectedItems: string[]
+  onToggleSelection: (item: Resource) => void
 }) {
   const [newResource, setNewResource] = useState("")
 
@@ -321,10 +641,78 @@ function ResourceSection({
           </Button>
         </div>
       )}
-      <div className="space-y-1 max-h-32 overflow-y-auto">
+      <div className="space-y-1 max-h-32 overflow-y-auto border border-dashed border-purple-200 p-2 rounded-md">
         {resources.map((resource) => (
-          <div key={resource.id} className="bg-purple-100 p-2 rounded text-sm cursor-move" draggable>
-            {resource.name}
+          <div 
+            key={resource.id} 
+            className={`${
+              resource.type === 'crew' ? 'bg-purple-200' :
+              resource.type === 'truck' ? 'bg-purple-100' :
+              resource.type === 'trailer' ? 'bg-green-100' :
+              'bg-yellow-100'
+            } p-2 rounded text-sm cursor-move flex justify-between items-center ${
+              selectedItems.includes(resource.id) ? 'ring-2 ring-orange-400' : ''
+            }`}
+            draggable
+            onDragStart={() => onDragStart(resource)}
+            onClick={() => onToggleSelection(resource)}
+          >
+            <span>{resource.name}</span>
+            {canEdit && (
+              <button className="text-xs opacity-70 hover:opacity-100">❌</button>
+            )}
+          </div>
+        ))}
+        {resources.length === 0 && (
+          <div className="text-center text-gray-400 py-2 text-xs">No items</div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function StatusBox({ 
+  title, 
+  items = [], 
+  onDragOver, 
+  onDrop,
+  isAdmin,
+  onRemoveItem
+}: { 
+  title: string
+  items?: Resource[]
+  onDragOver: (e: React.DragEvent) => void
+  onDrop: () => void
+  isAdmin: boolean
+  onRemoveItem: (index: number) => void
+}) {
+  return (
+    <div 
+      className="bg-white rounded-lg p-4 border-2 border-dashed border-purple-200 min-h-24"
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+    >
+      <h4 className="font-bold text-center mb-2">{title}</h4>
+      <div className="space-y-1">
+        {items.map((item, index) => (
+          <div 
+            key={`${item.id}_${index}`}
+            className={`p-2 rounded text-sm flex justify-between items-center ${
+              item.type === 'crew' ? 'bg-purple-200' :
+              item.type === 'truck' ? 'bg-purple-100' :
+              item.type === 'trailer' ? 'bg-green-100' :
+              'bg-yellow-100'
+            }`}
+          >
+            <span>{item.name}</span>
+            {isAdmin && (
+              <button 
+                className="text-xs opacity-70 hover:opacity-100"
+                onClick={() => onRemoveItem(index)}
+              >
+                ❌
+              </button>
+            )}
           </div>
         ))}
       </div>
@@ -332,18 +720,51 @@ function ResourceSection({
   )
 }
 
-function StatusBox({ title }: { title: string }) {
+function LocationZone({ 
+  title, 
+  items = [],
+  onDragOver,
+  onDrop,
+  isAdmin,
+  onRemoveItem
+}: { 
+  title: string
+  items?: Resource[]
+  onDragOver: (e: React.DragEvent) => void
+  onDrop: () => void
+  isAdmin: boolean
+  onRemoveItem: (index: number) => void
+}) {
   return (
-    <div className="bg-white rounded-lg p-4 border-2 border-dashed border-purple-200 min-h-24">
-      <h4 className="font-bold text-center">{title}</h4>
-    </div>
-  )
-}
-
-function LocationZone({ title }: { title: string }) {
-  return (
-    <div className="bg-white rounded-lg p-4 border-2 border-dashed border-purple-200 min-h-24">
-      <h4 className="font-bold text-center">{title}</h4>
+    <div 
+      className="bg-white rounded-lg p-4 border-2 border-dashed border-purple-200 min-h-24"
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+    >
+      <h4 className="font-bold text-center mb-2">{title}</h4>
+      <div className="space-y-1">
+        {items.map((item, index) => (
+          <div 
+            key={`${item.id}_${index}`}
+            className={`p-2 rounded text-sm flex justify-between items-center ${
+              item.type === 'crew' ? 'bg-purple-200' :
+              item.type === 'truck' ? 'bg-purple-100' :
+              item.type === 'trailer' ? 'bg-green-100' :
+              'bg-yellow-100'
+            }`}
+          >
+            <span>{item.name}</span>
+            {isAdmin && (
+              <button 
+                className="text-xs opacity-70 hover:opacity-100"
+                onClick={() => onRemoveItem(index)}
+              >
+                ❌
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
