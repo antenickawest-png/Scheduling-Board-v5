@@ -62,9 +62,10 @@ export default function Home() {
     return <LoginForm />
   }
 
-  console.log("[DEBUG] User authenticated or loading timed out, showing main UI")
+  console.log("[DEBUG] User authenticated or loading timed out, showing ScheduleBoard")
   
-  // If we have a user or loading timed out, show the original UI
+  // REPLACE THIS ENTIRE BLOCK:
+  /*
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
@@ -124,5 +125,8 @@ export default function Home() {
       </div>
     </div>
   )
+  */
+  
+  // WITH THIS SINGLE LINE:
+  return <ScheduleBoard />
 }
-
