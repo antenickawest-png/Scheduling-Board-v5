@@ -1,5 +1,8 @@
 "use client"
 
+// Add this export to prevent static prerendering
+export const dynamic = 'force-dynamic';
+
 import { useEffect, useState } from "react"
 import { useAuth } from "../hooks/use-auth"
 import LoginForm from "../components/login-form"
