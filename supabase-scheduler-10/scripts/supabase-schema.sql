@@ -1,6 +1,3 @@
--- Enable Row Level Security
-ALTER DATABASE postgres SET "app.jwt_secret" TO 'your-jwt-secret';
-
 -- Create users table for authentication
 CREATE TABLE IF NOT EXISTS public.users (
   id UUID REFERENCES auth.users(id) PRIMARY KEY,
@@ -68,15 +65,6 @@ INSERT INTO public.current_board (board_data, permanent_boxes_data, location_dat
 VALUES ('{}', '{}', '{}')
 ON CONFLICT DO NOTHING;
 
--- Create combos table
-CREATE TABLE IF NOT EXISTS public.combos (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  name TEXT NOT NULL,
-  resources JSONB NOT NULL,
-  created_by UUID REFERENCES public.users(id),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
 -- Enable Row Level Security
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.crews ENABLE ROW LEVEL SECURITY;
@@ -85,7 +73,6 @@ ALTER TABLE public.trailers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.equipment ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.schedules ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.current_board ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.combos ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies
 -- Users can read their own data and admins can read all
@@ -95,7 +82,7 @@ CREATE POLICY "Users can view own data" ON public.users
 CREATE POLICY "Admins can view all users" ON public.users
   FOR SELECT USING (
     EXISTS (
-      SELECT 1 FROM public.users 
+      SELECT 1 FROM public.users
       WHERE id = auth.uid() AND role = 'admin'
     )
   );
@@ -105,12 +92,11 @@ CREATE POLICY "Everyone can view resources" ON public.crews FOR SELECT USING (tr
 CREATE POLICY "Everyone can view resources" ON public.trucks FOR SELECT USING (true);
 CREATE POLICY "Everyone can view resources" ON public.trailers FOR SELECT USING (true);
 CREATE POLICY "Everyone can view resources" ON public.equipment FOR SELECT USING (true);
-CREATE POLICY "Everyone can view resources" ON public.combos FOR SELECT USING (true);
 
 CREATE POLICY "Admins can modify crews" ON public.crews
   FOR ALL USING (
     EXISTS (
-      SELECT 1 FROM public.users 
+      SELECT 1 FROM public.users
       WHERE id = auth.uid() AND role = 'admin'
     )
   );
@@ -118,7 +104,7 @@ CREATE POLICY "Admins can modify crews" ON public.crews
 CREATE POLICY "Admins can modify trucks" ON public.trucks
   FOR ALL USING (
     EXISTS (
-      SELECT 1 FROM public.users 
+      SELECT 1 FROM public.users
       WHERE id = auth.uid() AND role = 'admin'
     )
   );
@@ -126,7 +112,7 @@ CREATE POLICY "Admins can modify trucks" ON public.trucks
 CREATE POLICY "Admins can modify trailers" ON public.trailers
   FOR ALL USING (
     EXISTS (
-      SELECT 1 FROM public.users 
+      SELECT 1 FROM public.users
       WHERE id = auth.uid() AND role = 'admin'
     )
   );
@@ -134,15 +120,7 @@ CREATE POLICY "Admins can modify trailers" ON public.trailers
 CREATE POLICY "Admins can modify equipment" ON public.equipment
   FOR ALL USING (
     EXISTS (
-      SELECT 1 FROM public.users 
-      WHERE id = auth.uid() AND role = 'admin'
-    )
-  );
-
-CREATE POLICY "Admins can modify combos" ON public.combos
-  FOR ALL USING (
-    EXISTS (
-      SELECT 1 FROM public.users 
+      SELECT 1 FROM public.users
       WHERE id = auth.uid() AND role = 'admin'
     )
   );
@@ -152,7 +130,7 @@ CREATE POLICY "Everyone can view schedules" ON public.schedules FOR SELECT USING
 CREATE POLICY "Admins can modify schedules" ON public.schedules
   FOR ALL USING (
     EXISTS (
-      SELECT 1 FROM public.users 
+      SELECT 1 FROM public.users
       WHERE id = auth.uid() AND role = 'admin'
     )
   );
@@ -162,7 +140,7 @@ CREATE POLICY "Everyone can view current board" ON public.current_board FOR SELE
 CREATE POLICY "Admins can modify current board" ON public.current_board
   FOR ALL USING (
     EXISTS (
-      SELECT 1 FROM public.users 
+      SELECT 1 FROM public.users
       WHERE id = auth.uid() AND role = 'admin'
     )
   );
@@ -181,7 +159,3 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-
--- Create admin user (you'll need to sign up with this email first)
--- Then run this to make them admin:
--- UPDATE public.users SET role = 'admin' WHERE email = 'your-admin-email@example.com';
