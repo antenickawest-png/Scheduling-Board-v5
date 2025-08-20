@@ -2202,22 +2202,336 @@ document.addEventListener('DOMContentLoaded', function() {
   const SUPABASE_URL = "https://ldbjgdfkjnpxwvrofmkx.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkYmpnZGZram5weHd2cm9mbWt4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4OTMwMTYsImV4cCI6MjA3MDQ2OTAxNn0.2DeJq25bo_3nKG_PhkWaUUssVjUqQSRqsoeo8zZ4dFg";
   const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  
-  async function signIn(email, password) {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-    if (error) {
-      console.error(error);
-      alert('Login failed');
-    } else {
-      console.log('Logged in:', data);
-      alert('Login successful');
-      // TODO: Load saved schedules from Supabase table
+ 
+  // Initialize sync status variables
+  let syncInProgress = false;
+  let autoSyncEnabled = false;
+  let autoSyncInterval = null;
+ 
+  // Function to sync all data with Supabase
+  async function syncAllData() {
+    if (syncInProgress) return;
+   
+    syncInProgress = true;
+    const syncButton = document.getElementById('btnSyncNow');
+    const originalText = syncButton.textContent;
+    syncButton.textContent = '⏳ Syncing...';
+   
+    try {
+      // 1. Sync user data
+      await syncUserData();
+     
+      // 2. Sync schedule data
+      await syncScheduleData();
+     
+      // 3. Sync resources
+      await syncResourceData();
+     
+      // 4. Sync location data
+      await syncLocationData();
+     
+      // Show success message
+      syncButton.textContent = '✅ Synced!';
+      setTimeout(() => {
+        syncButton.textContent = originalText;
+      }, 2000);
+     
+    } catch (error) {
+      console.error('Sync failed:', error);
+      syncButton.textContent = '❌ Failed!';
+      setTimeout(() => {
+        syncButton.textContent = originalText;
+      }, 2000);
+    } finally {
+      syncInProgress = false;
     }
   }
+ 
+  // Sync user data
+  async function syncUserData() {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+   
+    // First, get existing users from Supabase
+    const { data: existingUsers, error: fetchError } = await supabase
+      .from('users')
+      .select('*');
+     
+    if (fetchError) throw fetchError;
+   
+    // Prepare data for upsert (update if exists, insert if not)
+    const dataToUpsert = users.map(user => ({
+      username: user.username,
+      role: user.role,
+      password_changed: user.passwordChanged || false,
+      // Don't sync actual passwords for security, just sync if it's been changed
+      // We'll use a separate secure method for password sync if needed
+    }));
+   
+    // Upsert the data
+    const { error: upsertError } = await supabase
+      .from('users')
+      .upsert(dataToUpsert, {
+        onConflict: 'username',
+        ignoreDuplicates: false
+      });
+     
+    if (upsertError) throw upsertError;
+   
+    // Check for users that exist in Supabase but not in local storage
+    // and download them
+    if (existingUsers) {
+      const localUsernames = users.map(u => u.username);
+      const newUsers = existingUsers.filter(u => !localUsernames.includes(u.username));
+     
+      if (newUsers.length > 0) {
+        // Add new users to local storage
+        newUsers.forEach(newUser => {
+          users.push({
+            username: newUser.username,
+            password: DEFAULT_PASSWORD, // Use default password for new users
+            role: newUser.role,
+            passwordChanged: newUser.password_changed || false
+          });
+        });
+       
+        localStorage.setItem('users', JSON.stringify(users));
+       
+        // Reload user list if on user management page
+        if (document.getElementById('page3').classList.contains('active') && isAdmin) {
+          loadUsers();
+        }
+      }
+    }
+  }
+ 
+  // Sync schedule data
+  async function syncScheduleData() {
+    const scheds = JSON.parse(localStorage.getItem('scheds') || '[]');
+   
+    // First, get existing schedules from Supabase
+    const { data: existingScheds, error: fetchError } = await supabase
+      .from('schedules')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(50);
+     
+    if (fetchError) throw fetchError;
+   
+    // Prepare local schedules for upload
+    const localSchedsToUpload = scheds.map((sched, index) => ({
+      id: `${currentUser}_${new Date(sched.time).getTime()}`,
+      user: currentUser,
+      time_created: sched.time,
+      html_content: sched.html,
+      sort_order: index
+    }));
+   
+    // Upsert schedules to Supabase
+    const { error: upsertError } = await supabase
+      .from('schedules')
+      .upsert(localSchedsToUpload, {
+        onConflict: 'id',
+        ignoreDuplicates: false
+      });
+     
+    if (upsertError) throw upsertError;
+   
+    // Download schedules from Supabase that aren't in local storage
+    if (existingScheds) {
+      const localSchedTimes = scheds.map(s => s.time);
+      const newScheds = existingScheds.filter(s => !localSchedTimes.includes(s.time_created));
+     
+      if (newScheds.length > 0) {
+        // Add new schedules to local storage
+        newScheds.forEach(newSched => {
+          scheds.push({
+            time: newSched.time_created,
+            html: newSched.html_content
+          });
+        });
+       
+        // Sort by time (newest first)
+        scheds.sort((a, b) => new Date(b.time) - new Date(a.time));
+       
+        // Limit to 50 schedules
+        if (scheds.length > 50) {
+          scheds = scheds.slice(0, 50);
+        }
+       
+        localStorage.setItem('scheds', JSON.stringify(scheds));
+       
+        // Update UI
+        populateSavedFirst();
+        populateSaved();
+      }
+    }
+  }
+ 
+  // Sync resource data (crew, trucks, trailers, equipment)
+  async function syncResourceData() {
+    // Sync crews
+    await syncResourceType('crews');
+   
+    // Sync trucks
+    await syncResourceType('trucks');
+   
+    // Sync trailers
+    await syncResourceType('trailers');
+   
+    // Sync equipment
+    await syncResourceType('equipment');
+   
+    // Sync combos
+    await syncResourceType('combos');
+  }
+ 
+  // Helper function to sync a specific resource type
+  async function syncResourceType(resourceType) {
+    const resources = JSON.parse(localStorage.getItem(resourceType) || '[]');
+   
+    // First, get existing resources from Supabase
+    const { data: existingResources, error: fetchError } = await supabase
+      .from(resourceType)
+      .select('*');
+     
+    if (fetchError) throw fetchError;
+   
+    // Prepare local resources for upload
+    const localResourcesToUpload = resources.map(resource => ({
+      id: resource.id,
+      name: resource.name,
+      // For combos, include resources array
+      ...(resourceType === 'combos' && { resources: JSON.stringify(resource.resources) })
+    }));
+   
+    // Upsert resources to Supabase
+    const { error: upsertError } = await supabase
+      .from(resourceType)
+      .upsert(localResourcesToUpload, {
+        onConflict: 'id',
+        ignoreDuplicates: false
+      });
+     
+    if (upsertError) throw upsertError;
+   
+    // Download resources from Supabase that aren't in local storage
+    if (existingResources) {
+      const localResourceIds = resources.map(r => r.id);
+      const newResources = existingResources.filter(r => !localResourceIds.includes(r.id));
+     
+      if (newResources.length > 0) {
+        // Add new resources to local storage
+        newResources.forEach(newResource => {
+          if (resourceType === 'combos') {
+            resources.push({
+              id: newResource.id,
+              name: newResource.name,
+              resources: JSON.parse(newResource.resources || '[]')
+            });
+          } else {
+            resources.push({
+              id: newResource.id,
+              name: newResource.name
+            });
+          }
+        });
+       
+        localStorage.setItem(resourceType, JSON.stringify(resources));
+       
+        // Update UI
+        if (resourceType === 'crews') renderCrew();
+        else if (resourceType === 'trucks') renderTruck();
+        else if (resourceType === 'trailers') renderTrailer();
+        else if (resourceType === 'equipment') renderEquipment();
+        else if (resourceType === 'combos') renderCombos();
+      }
+    }
+  }
+ 
+  // Sync location data
+  async function syncLocationData() {
+    const locations = JSON.parse(localStorage.getItem('locations') || '{}');
+   
+    // First, get existing location data from Supabase
+    const { data: existingLocations, error: fetchError } = await supabase
+      .from('locations')
+      .select('*')
+      .eq('user', currentUser)
+      .single();
+     
+    if (fetchError && fetchError.code !== 'PGRST116') throw fetchError; // Ignore "not found" error
+   
+    // Prepare location data for upload
+    const locationData = {
+      user: currentUser,
+      locations: JSON.stringify(locations),
+      updated_at: new Date().toISOString()
+    };
+   
+    // Upsert location data to Supabase
+    const { error: upsertError } = await supabase
+      .from('locations')
+      .upsert(locationData, {
+        onConflict: 'user',
+        ignoreDuplicates: false
+      });
+     
+    if (upsertError) throw upsertError;
+   
+    // Download location data from Supabase if it's newer
+    if (existingLocations) {
+      const serverLocations = JSON.parse(existingLocations.locations || '{}');
+     
+      // Check if server data is different from local data
+      if (JSON.stringify(serverLocations) !== JSON.stringify(locations)) {
+        localStorage.setItem('locations', JSON.stringify(serverLocations));
+       
+        // Update UI if on the locations page
+        if (document.getElementById('page1').classList.contains('active')) {
+          loadLocationData();
+        }
+      }
+    }
+  }
+ 
+  // Toggle auto-sync
+  function toggleAutoSync() {
+    const autoSyncBtn = document.getElementById('btnAutoSync');
+   
+    if (autoSyncEnabled) {
+      // Disable auto-sync
+      clearInterval(autoSyncInterval);
+      autoSyncEnabled = false;
+      autoSyncBtn.textContent = '⏱ Auto-sync (30s)';
+      autoSyncBtn.style.backgroundColor = '';
+    } else {
+      // Enable auto-sync
+      autoSyncEnabled = true;
+      autoSyncBtn.textContent = '⏱ Auto-sync (ON)';
+      autoSyncBtn.style.backgroundColor = '#c8e6c9'; // Light green background
+     
+      // Sync immediately
+      syncAllData();
+     
+      // Set up interval for auto-sync every 30 seconds
+      autoSyncInterval = setInterval(syncAllData, 30000);
+    }
+  }
+ 
+  // Add event listeners when document is loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add event listener for Sync Now button
+    const syncNowBtn = document.getElementById('btnSyncNow');
+    if (syncNowBtn) {
+      syncNowBtn.addEventListener('click', syncAllData);
+    }
+   
+    // Add event listener for Auto Sync button
+    const autoSyncBtn = document.getElementById('btnAutoSync');
+    if (autoSyncBtn) {
+      autoSyncBtn.addEventListener('click', toggleAutoSync);
+    }
+  });
 </script>
-
-</body>
+  </body>
 </html>
