@@ -1,28 +1,9 @@
-
 "use client"
-
-useEffect(() => {
-  console.log("[DEBUG] useEffect for resources and sync running")
-  if (user) {
-    try {
-      console.log("[DEBUG] Loading resources")
-      loadResources()
-      console.log("[DEBUG] Loading schedules")
-      loadSchedules()
-      // Comment out this line temporarily
-      // console.log("[DEBUG] Syncing from Supabase")
-      // syncFromSupabase()
-      console.log("[DEBUG] Resources and sync complete")
-    } catch (error) {
-      console.error("[DEBUG] Error in resources/sync useEffect:", error)
-    }
-  }
-}, [user])
 
 import { useEffect, useState, useRef } from "react"
 import { useAuth } from "../hooks/use-auth"
 import { useSync } from "../hooks/use-sync"
-import { supabase } from "../supabase"
+import { supabase } from "@/lib/supabase" // Updated import path
 import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select"
@@ -76,6 +57,25 @@ export function ScheduleBoard() {
   const [selectedItems, setSelectedItems] = useState<string[]>([])
   const [comboName, setComboName] = useState("")
   const [showComboControls, setShowComboControls] = useState(false)
+
+  // Moved this useEffect inside the component
+  useEffect(() => {
+    console.log("[DEBUG] useEffect for resources and sync running")
+    if (user) {
+      try {
+        console.log("[DEBUG] Loading resources")
+        loadResources()
+        console.log("[DEBUG] Loading schedules")
+        loadSchedules()
+        // Comment out this line temporarily
+        // console.log("[DEBUG] Syncing from Supabase")
+        // syncFromSupabase()
+        console.log("[DEBUG] Resources and sync complete")
+      } catch (error) {
+        console.error("[DEBUG] Error in resources/sync useEffect:", error)
+      }
+    }
+  }, [user])
 
   useEffect(() => {
     if (user) {
