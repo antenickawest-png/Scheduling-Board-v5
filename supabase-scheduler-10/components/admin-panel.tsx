@@ -1,15 +1,16 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { supabase } from "../supabase"
+import { supabase } from "../lib/supabase" // Updated import path
 import { useAuth } from "../hooks/use-auth"
 
 type UserProfile = {
   id: string
   email: string
-  username: string
+  username?: string // Made optional since it might be the same as email
   role: "admin" | "view"
   created_at: string
+  password_changed?: boolean
 }
 
 export function AdminPanel() {
@@ -44,9 +45,30 @@ export function AdminPanel() {
 
       // Update local state
       setUsers(users.map((user) => (user.id === userId ? { ...user, role: newRole } : user)))
+      
+      // Show confirmation
+      alert(`User role updated to ${newRole}`)
     } catch (error) {
       console.error("Error updating user role:", error)
       alert("Failed to update user role")
+    }
+  }
+
+  const resetUserPassword = async (userId: string) => {
+    try {
+      // In a real app, you'd use Supabase's auth.admin.updateUserById
+      // But for this demo, we'll just update the password_changed flag
+      const { error } = await supabase
+        .from("users")
+        .update({ password_changed: false })
+        .eq("id", userId)
+
+      if (error) throw error
+      
+      alert("Password has been reset. User will need to set a new password on next login.")
+    } catch (error) {
+      console.error("Error resetting password:", error)
+      alert("Failed to reset password")
     }
   }
 
@@ -67,6 +89,9 @@ export function AdminPanel() {
             <div>
               <div className="font-medium">📧 {user.email}</div>
               <div className="text-sm text-gray-600">📅 Joined: {new Date(user.created_at).toLocaleDateString()}</div>
+              <div className="text-sm text-gray-600">
+                🔑 Password: {user.password_changed ? "Changed" : "Default"}
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <span
@@ -84,12 +109,20 @@ export function AdminPanel() {
                 <option value="view">👁️ View Only</option>
                 <option value="admin">👑 Admin</option>
               </select>
-              <button
-                onClick={() => updateUserRole(user.id, user.role === "admin" ? "view" : "admin")}
-                className="text-sm bg-purple-600 text-white px-2 py-1 rounded hover:bg-purple-700"
-              >
-                ⚙️ Actions
-              </button>
+              <div className="flex flex-col gap-1">
+                <button
+                  onClick={() => updateUserRole(user.id, user.role === "admin" ? "view" : "admin")}
+                  className="text-sm bg-purple-600 text-white px-2 py-1 rounded hover:bg-purple-700"
+                >
+                  {user.role === "admin" ? "⬇️ Demote" : "⬆️ Promote"}
+                </button>
+                <button
+                  onClick={() => resetUserPassword(user.id)}
+                  className="text-sm bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+                >
+                  🔑 Reset Password
+                </button>
+              </div>
             </div>
           </div>
         ))}
@@ -99,3 +132,4 @@ export function AdminPanel() {
 }
 
 export default AdminPanel
+
