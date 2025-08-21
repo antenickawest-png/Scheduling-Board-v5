@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import type { User } from "@supabase/supabase-js";
-import { supabase } from "../supabase"; // <- keep relative import
+import { supabase } from "../lib/supabase"; // Updated import path
 
 type UserProfile = {
   id: string;
@@ -17,7 +17,7 @@ type AuthContextType = {
   profile: UserProfile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error?: string }>;
-  signUp: (email: string, password: string, username: string) => Promise<{ error?: string }>;
+  signUp: (email: string, password: string, username: string) => Promise<{ error?: string, user?: User }>;
   signOut: () => Promise<void>;
   isAdmin: boolean;
 };
@@ -82,7 +82,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) return { error: error.message };
       return {};
-    } catch {
+    } catch (err) {
+      console.error("Sign in error:", err);
       return { error: "An unexpected error occurred" };
     }
   }, []);
@@ -93,24 +94,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         process.env.NEXT_PUBLIC_SITE_URL ||
         (typeof window !== "undefined" ? window.location.origin : "");
 
-      const { error } = await supabase.auth.signUp({
+      // Check if this is the admin email
+      const isAdminEmail = email.toLowerCase() === 'antenicka.west@rnstower.com';
+      
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { username },
+          data: { 
+            username,
+            role: isAdminEmail ? 'admin' : 'view' // Set role based on email
+          },
           emailRedirectTo: redirectBase ? `${redirectBase}/auth/callback` : undefined,
         },
       });
 
       if (error) return { error: error.message };
-      return {};
-    } catch {
+      
+      // If this is the admin email, update the role in the users table directly
+      if (isAdminEmail && data?.user) {
+        await supabase
+          .from('users')
+          .update({ role: 'admin' })
+          .eq('id', data.user.id);
+      }
+      
+      return { user: data?.user };
+    } catch (err) {
+      console.error("Sign up error:", err);
       return { error: "An unexpected error occurred" };
     }
   }, []);
 
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.error("Sign out error:", err);
+    }
   }, []);
 
   const value: AuthContextType = {
