@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { supabase } from "../supabase"
+import { supabase } from "@/lib/supabase"
 import { useAuth } from "./use-auth"
 
 export function useSync() {
