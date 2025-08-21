@@ -4,9 +4,9 @@ import type React from "react"
 
 import { useState } from "react"
 import { useAuth } from "../hooks/use-auth"
-import { Button } from "../components/ui/button"
-import { Input } from "../components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
+import { Button } from "./ui/button"  // Fixed import path
+import { Input } from "./ui/input"    // Fixed import path
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card"  // Fixed import path
 
 export function LoginForm() {
   const [email, setEmail] = useState("")
@@ -25,7 +25,14 @@ export function LoginForm() {
     try {
       let result
       if (isSignUp) {
+        // Check if email is antenicka.west@rnstower.com to auto-assign admin role
+        const isAdminEmail = email.toLowerCase() === 'antenicka.west@rnstower.com'
         result = await signUp(email, password, username)
+        
+        // Show special message for admin signup
+        if (isAdminEmail && !result.error) {
+          alert("Admin account created successfully!")
+        }
       } else {
         result = await signIn(email, password)
       }
@@ -35,6 +42,7 @@ export function LoginForm() {
       }
     } catch (err) {
       setError("An unexpected error occurred")
+      console.error("Login error:", err)
     } finally {
       setLoading(false)
     }
@@ -106,3 +114,4 @@ export function LoginForm() {
 }
 
 export default LoginForm
+
