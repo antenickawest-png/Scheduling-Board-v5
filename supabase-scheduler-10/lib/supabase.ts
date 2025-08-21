@@ -1,3 +1,4 @@
+// lib/supabase.ts
 import { createClient } from "@supabase/supabase-js"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
@@ -138,24 +139,7 @@ export type Database = {
           last_updated_by?: string | null
         }
       }
-      combos: {
-        Row: {
-          id: string
-          name: string
-          resources: any
-          created_by: string | null
-          created_at: string
-        }
-        Insert: {
-          name: string
-          resources: any
-          created_by?: string | null
-        }
-        Update: {
-          name?: string
-          resources?: any
-        }
-      }
+      // Remove the combos table definition
     }
   }
 }
