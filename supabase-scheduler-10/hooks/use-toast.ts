@@ -6,7 +6,7 @@ import * as React from "react"
 import type {
   ToastActionElement,
   ToastProps,
-} from "@/components/ui/toast"
+} from "../components/ui/toast" // Updated import path
 
 const TOAST_LIMIT = 1
 const TOAST_REMOVE_DELAY = 1000000
@@ -170,6 +170,33 @@ function toast({ ...props }: Toast) {
     update,
   }
 }
+
+// Helper functions for common toast types
+toast.success = (message: string, options = {}) => {
+  return toast({
+    title: "Success",
+    description: message,
+    variant: "default",
+    ...options,
+  });
+};
+
+toast.error = (message: string, options = {}) => {
+  return toast({
+    title: "Error",
+    description: message,
+    variant: "destructive",
+    ...options,
+  });
+};
+
+toast.info = (message: string, options = {}) => {
+  return toast({
+    title: "Info",
+    description: message,
+    ...options,
+  });
+};
 
 function useToast() {
   const [state, setState] = React.useState<State>(memoryState)
