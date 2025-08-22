@@ -1004,7 +1004,7 @@ async function attemptLogin() {
   
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: username + '@company.com', // Convert username to email format
+      email: username + '@rnstower.com', // Convert username to correct email format
       password: password
     });
     
@@ -2364,4 +2364,5 @@ function exportPDFPage2() {
 
 </body>
 </html>
+
 
