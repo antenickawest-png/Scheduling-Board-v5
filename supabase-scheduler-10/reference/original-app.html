@@ -2379,7 +2379,7 @@ async function requestPasswordReset() {
   }
   
   try {
-    const { error } = await supabase.auth.resetPasswordForEmail(username + '@company.com', {
+    const { error } = await supabase.auth.resetPasswordForEmail(username + '@rnstower.com', {
       redirectTo: window.location.origin
     });
     
@@ -2407,6 +2407,7 @@ async function requestPasswordReset() {
 
 </body>
 </html>
+
 
 
 
