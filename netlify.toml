@@ -1,22 +1,19 @@
 [build]
-  base = "supabase-scheduler-10"
-  command = "npm run build"
-  publish = "out"  # Changed from .next to out since you're using output: 'export'
+  base = "supabase-scheduler-10/reference"
+  publish = "."
+  command = "echo 'No build needed for static HTML'"
 
 [build.environment]
-  NODE_VERSION = "22.18.0"
-  NEXT_PUBLIC_SITE_URL = "https://msweeklyboard.com"
-  # Add this to disable SSR for the Next.js plugin
-  NEXT_USE_NETLIFY_EDGE = "false"
-
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
-  [plugins.inputs]
-    # Add this to disable SSR
-    staticExport = true
+  NODE_VERSION = "18"
 
 [[redirects]]
   from = "/*"
-  to = "/index.html"
+  to = "/original-app.html"
   status = 200
   force = false
+
+# Optional: Set custom headers for your HTML file
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
