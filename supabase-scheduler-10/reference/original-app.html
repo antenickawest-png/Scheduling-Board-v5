@@ -1,3 +1,30 @@
+
+
+1 of 2,115
+(no subject)
+External
+Inbox
+
+
+Antenicka West
+Attachments1:11 PM (2 hours ago)
+-- Antenicka WestAssistant Project ManagerCell: 314-546-8365 Office: 314-899-9444 Fax: 844-357-6444 Email: antenicka.west@rnstower.com
+
+Nicka
+Attachments2:29 PM (53 minutes ago)
+On Tue, Aug 26, 2025 at 1:11 PM Antenicka West <antenicka.west@rnstower.com> wrote: -- Antenicka WestAssistant Project ManagerCell: 314-546-8365 Office: 314-899
+
+Nicka
+Attachments3:07 PM (14 minutes ago)
+On Tue, Aug 26, 2025 at 2:29 PM Nicka <nickawest214@gmail.com> wrote: On Tue, Aug 26, 2025 at 1:11 PM Antenicka West <antenicka.west@rnstower.com> wrote: -- Ant
+
+Nicka
+Attachments
+3:20 PM (2 minutes ago)
+to me
+
+ One attachment
+  •  Scanned by Gmail
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -759,6 +786,41 @@ h1, h2 {
     padding: 10px;
   }
 }
+
+  .admin-panel {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+}
+
+.user-management, .sync-controls {
+  margin: 15px 0;
+}
+
+.users-list {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  padding: 10px;
+  background: white;
+}
+
+.user-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.sync-status {
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #666;
+}
+  
 </style>
 <script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
 </head>
@@ -766,10 +828,15 @@ h1, h2 {
 <!-- Login Page -->
 <div id="loginPage" class="login-container">
   <div class="login-box">
+    
     <h2>🔐 R&S Weekly Schedule</h2>
     <div id="loginError" class="login-error">Invalid username or password</div>
     <form class="login-form" id="loginForm" onsubmit="return false;">
-      <input type="text" id="username" placeholder="Username" required>
+                    <div class="form-group">
+                        <label for="username">Email:</label>
+                        <!-- Updated placeholder and input type for email -->
+                        <input type="email" id="username" placeholder="Enter your email" required>
+                    </div>
       <input type="password" id="password" placeholder="Password" required>
       <button type="submit" onclick="attemptLogin()">🚀 Login</button>
       <div class="forgot-password" onclick="showForgotPassword()">Forgot password?</div>
@@ -820,6 +887,30 @@ h1, h2 {
   </div>
 </div>
 
+<!-- Admin Panel Section (only visible to admins) -->
+<div id="admin-panel" class="admin-panel" style="display: none;">
+  <h3>Admin Panel</h3>
+  
+  <!-- User Management -->
+  <div class="user-management">
+    <h4>User Management</h4>
+    <div id="users-list" class="users-list">
+      <!-- Users will be populated here -->
+    </div>
+  </div>
+  
+  <!-- Sync Controls -->
+  <div class="sync-controls">
+    <h4>Data Sync</h4>
+    <button id="manual-sync-btn" class="btn">Manual Sync</button>
+    <button id="toggle-auto-sync-btn" class="btn">Toggle Auto Sync</button>
+    <div id="sync-status" class="sync-status">
+      <span id="last-sync-time">Never synced</span>
+    </div>
+  </div>
+</div>
+
+  
 <!-- Main Application -->
 <div id="appContainer" style="display: none;">
   <header>
@@ -830,8 +921,8 @@ h1, h2 {
       <button id="tab3" onclick="showPage(3)" class="admin-only">👥 User Management</button>
     </nav>
     <div class="user-controls">
-      <button id="btnSyncNow" class="logout-btn" title="Force cloud load/save">☁️ Sync now</button>
-      <button id="btnAutoSync" class="logout-btn" title="Toggle 30s auto-sync">⏱ Auto-sync (30s)</button>
+      
+      
       <!-- Combo Save Button hidden -->
       <div class="user-info">
         <span id="currentUser">User</span> (<span id="userRole">Role</span>)
@@ -844,6 +935,7 @@ h1, h2 {
   <div id="page1" class="page active">
     <h1>📅 Weekly Sites & Resources</h1>
     <div class="controls">
+      <button class="primary pdf-btn" onclick="exportToPDF()">📄 Export PDF</button>
       <button class="primary" onclick="addSite()">➕ Add Site</button>
       <button class="primary" onclick="deleteSite()">🗑️ Delete Site</button>
       <button class="primary" onclick="clearSites()">🧹 Clear Board</button>
@@ -852,8 +944,6 @@ h1, h2 {
       <button class="primary" onclick="loadSaved()">📂 Load</button>
       <select id="savedSelectFirst"></select>
       <button class="primary" onclick="saveSnapshot()">📸 Save Snapshot</button>
-      <!-- Added high-resolution PDF export button -->
-      <button class="primary" onclick="exportPDF()">📄 Export PDF</button>
     </div>
     <div class="combo-controls" style="display:none;">
       <input type="text" class="combo-name" id="comboName" placeholder="Combo Name">
@@ -917,6 +1007,7 @@ h1, h2 {
     <div class="locations-header">
       <h2>📍 Locations</h2>
       <div class="controls">
+      <button class="primary pdf-btn" onclick="exportToPDF()">📄 Export PDF</button>
         <button class="primary" onclick="saveLocationBoard()">💾 Save Locations</button>
         <button class="primary" onclick="clearLocationBoard()">🧹 Clear Locations</button>
       </div>
@@ -938,11 +1029,10 @@ h1, h2 {
   <div id="page2" class="page">
     <h1>💾 Saved Schedules</h1>
     <div class="controls">
+      <button class="primary pdf-btn" onclick="exportToPDF()">📄 Export PDF</button>
       <select id="savedSelect"></select>
       <button class="primary" onclick="loadSavedPage2()">📂 Load Sites</button>
       <button class="primary" onclick="saveSnapshotPage2()">📸 Save Snapshot</button>
-      <!-- Added PDF export button for saved schedules page -->
-      <button class="primary" onclick="exportPDFPage2()">📄 Export PDF</button>
       <button class="primary" onclick="clearSavedLogs()">🧹 Clear Saved Logs</button>
     </div>
     <div id="savedBoardDisplay" class="board"></div>
@@ -969,6 +1059,7 @@ h1, h2 {
       </div>
       
       <div class="controls">
+      <button class="primary pdf-btn" onclick="exportToPDF()">📄 Export PDF</button>
         <button class="primary" onclick="resetAllPasswords()">🔑 Reset All Passwords to 1234</button>
       </div>
       
@@ -991,133 +1082,357 @@ h1, h2 {
 </div>
 
 <script>
-const SUPABASE_URL = "https://ldbjgdfkjnpxwvrofmkx.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkYmpnZGZram5weHd2cm9mbWt4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4OTMwMTYsImV4cCI6MjA3MDQ2OTAxNn0.2DeJq25bo_3nKG_PhkWaUUssVjUqQSRqsoeo8zZ4dFg";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ldbjgdfkjnpxwvrofmkx.supabase.co';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkYmpnZGZram5weHd2cm9mbWt4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4OTMwMTYsImV4cCI6MjA3MDQ2OTAxNn0.2DeJq25bo_3nKG_PhkWaUUssVjUqQSRqsoeo8zZ4dFg';
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+// User Authentication System
 let currentUser = null;
 let isAdmin = false;
+const DEFAULT_PASSWORD = '1234';
 
-async function attemptLogin() {
-  const username = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
-  
+async function checkAuthSession() {
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: username + '@rnstower.com', // Convert username to correct email format
-      password: password
-    });
-    
-    if (error) throw error;
-    
-    // Get user details from users table
-    const { data: userData, error: userError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('username', username)
-      .single();
-    
-    if (userError) throw userError;
-    
-    currentUser = userData.username;
-    isAdmin = userData.role === 'admin';
-    
-    if (!userData.password_changed) {
-      document.getElementById('passwordChangeModal').style.display = 'block';
-    } else {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session && session.user) {
+      currentUser = session.user.email;
+      
+      // Get user profile from database
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('email', session.user.email)
+        .single();
+      
+      isAdmin = profile?.role === 'admin';
+      
+      // Show main app
       document.getElementById('loginPage').style.display = 'none';
       document.getElementById('appContainer').style.display = 'block';
       document.getElementById('currentUser').textContent = currentUser;
-      document.getElementById('userRole').textContent = userData.role;
-      await loadAllResources();
+      document.getElementById('userRole').textContent = profile?.role || 'user';
+      
+      updateAdminVisibility();
+      renderAll();
+      populateSavedFirst();
+      populateSaved();
+      loadLocationData();
+      
+      if (isAdmin) {
+        loadUsers();
+      }
     }
   } catch (error) {
-    console.error('Login error:', error);
-    document.getElementById('loginError').textContent = 'Invalid username or password';
-    document.getElementById('loginError').style.display = 'block';
+    console.error('Auth session check error:', error);
   }
 }
 
-async function changePassword() {
-  const newPassword1 = document.getElementById('newPassword1').value;
-  const newPassword2 = document.getElementById('newPassword2').value;
+async function attemptLogin() {
+  const email = document.getElementById('username').value;
+  const password = document.getElementById('password').value;
   
-  if (newPassword1 !== newPassword2) {
-    document.getElementById('passwordChangeMessage').textContent = 'Passwords do not match';
-    document.getElementById('passwordChangeMessage').style.display = 'block';
+  if (!email || !password) {
+    showLoginError('Please enter both email and password');
+    return;
+  }
+
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+
+    if (error) {
+      showLoginError('Login failed: ' + error.message);
+      return;
+    }
+
+    if (data.user) {
+      currentUser = data.user.email;
+      
+      // Get or create user profile
+      let { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('email', data.user.email)
+        .single();
+      
+      if (profileError && profileError.code === 'PGRST116') {
+        // Profile doesn't exist, create it
+        const { data: newProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert([{
+            email: data.user.email,
+            role: data.user.email === 'antenicka.west@rnstower.com' ? 'admin' : 'user',
+            password_changed: true
+          }])
+          .select()
+          .single();
+        
+        if (createError) {
+          showLoginError('Error creating profile: ' + createError.message);
+          return;
+        }
+        profile = newProfile;
+      } else if (profileError) {
+        showLoginError('Error fetching profile: ' + profileError.message);
+        return;
+      }
+      
+      isAdmin = profile.role === 'admin';
+      
+      // Update UI
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('appContainer').style.display = 'block';
+      document.getElementById('currentUser').textContent = currentUser;
+      document.getElementById('userRole').textContent = profile.role;
+      
+      updateAdminVisibility();
+      renderAll();
+      populateSavedFirst();
+      populateSaved();
+      loadLocationData();
+      
+      if (isAdmin) {
+        loadUsers();
+      }
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    showLoginError('Login failed. Please try again.');
+  }
+}
+
+function showLoginError(message) {
+  const errorDiv = document.getElementById('loginError');
+  errorDiv.textContent = message;
+  errorDiv.style.display = 'block';
+  setTimeout(() => {
+    errorDiv.style.display = 'none';
+  }, 5000);
+}
+
+async function logout() {
+  try {
+    await supabase.auth.signOut();
+    currentUser = null;
+    isAdmin = false;
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('appContainer').style.display = 'none';
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
+  } catch (error) {
+    console.error('Logout error:', error);
+  }
+}
+
+function updateAdminVisibility() {
+  const adminElements = document.querySelectorAll('.admin-only');
+  adminElements.forEach(el => {
+    el.style.display = isAdmin ? 'block' : 'none';
+  });
+}
+
+async function loadUsers() {
+  try {
+    const { data: users, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .order('email');
+    
+    if (error) {
+      console.error('Error loading users:', error);
+      return;
+    }
+    
+    const tableBody = document.getElementById('userTableBody');
+    tableBody.innerHTML = '';
+    
+    users.forEach(user => {
+      const row = document.createElement('tr');
+      
+      const usernameCell = document.createElement('td');
+      usernameCell.textContent = user.email;
+      row.appendChild(usernameCell);
+      
+      const roleCell = document.createElement('td');
+      roleCell.textContent = user.role;
+      row.appendChild(roleCell);
+      
+      const passwordStatusCell = document.createElement('td');
+      passwordStatusCell.textContent = user.password_changed ? 'Changed' : 'Default';
+      row.appendChild(passwordStatusCell);
+      
+      const actionsCell = document.createElement('td');
+      
+      if (user.email !== currentUser) {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.textContent = '🗑️ Delete';
+        deleteBtn.className = 'action-btn delete-btn';
+        deleteBtn.onclick = () => deleteUser(user.email);
+        actionsCell.appendChild(deleteBtn);
+      } else {
+        actionsCell.textContent = 'Current User';
+      }
+      
+      row.appendChild(actionsCell);
+      tableBody.appendChild(row);
+    });
+  } catch (error) {
+    console.error('Error loading users:', error);
+  }
+}
+
+async function addUser() {
+  const email = document.getElementById('newUsername').value;
+  const role = document.getElementById('newRole').value;
+  
+  if (!email) {
+    alert('Please enter an email');
     return;
   }
   
   try {
-    // Update auth password
-    const { error: authError } = await supabase.auth.updateUser({
-      password: newPassword1
-    });
-    
-    if (authError) throw authError;
-    
-    // Update user record
-    const { error: updateError } = await supabase
-      .from('users')
-      .update({ password_changed: true })
-      .eq('username', currentUser);
-    
-    if (updateError) throw updateError;
-    
-    document.getElementById('passwordChangeModal').style.display = 'none';
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('appContainer').style.display = 'block';
-    document.getElementById('currentUser').textContent = currentUser;
-    
-    const { data: userData } = await supabase
-      .from('users')
-      .select('role')
-      .eq('username', currentUser)
+    // Check if user already exists
+    const { data: existingUser } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('email', email)
       .single();
     
-    document.getElementById('userRole').textContent = userData.role;
-    await loadAllResources();
+    if (existingUser) {
+      alert('User already exists');
+      return;
+    }
+    
+    // Create user profile
+    const { error } = await supabase
+      .from('profiles')
+      .insert([{
+        email: email,
+        role: role,
+        password_changed: false
+      }]);
+    
+    if (error) {
+      alert('Error adding user: ' + error.message);
+      return;
+    }
+    
+    // Clear form
+    document.getElementById('newUsername').value = '';
+    
+    // Reload user list
+    loadUsers();
+    
+    alert(`User ${email} added. They can sign up with this email.`);
   } catch (error) {
-    console.error('Password change error:', error);
-    document.getElementById('passwordChangeMessage').textContent = 'Error changing password';
-    document.getElementById('passwordChangeMessage').style.display = 'block';
+    console.error('Error adding user:', error);
+    alert('Error adding user');
   }
 }
 
-async function addResource(key, textAreaId, listId, type) {
+async function deleteUser(email) {
+  if (confirm(`Are you sure you want to delete user ${email}?`)) {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('email', email);
+      
+      if (error) {
+        alert('Error deleting user: ' + error.message);
+        return;
+      }
+      
+      loadUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert('Error deleting user');
+    }
+  }
+}
+
+async function deleteResource(key, id, listId, type) {
+  try {
+    const { error } = await supabase
+      .from('resources')
+      .delete()
+      .eq('id', id)
+      .eq('user_email', currentUser);
+    
+    if (error) {
+      console.error('Error deleting resource:', error);
+      return;
+    }
+    
+    render(key, listId, type);
+  } catch (error) {
+    console.error('Error deleting resource:', error);
+  }
+}
+
+async function clearResource(key, listId, type) {
+  if (confirm('Clear all ' + key + '?')) {
+    try {
+      const { error } = await supabase
+        .from('resources')
+        .delete()
+        .eq('user_email', currentUser)
+        .eq('type', key);
+      
+      if (error) {
+        console.error('Error clearing resources:', error);
+        return;
+      }
+      
+      render(key, listId, type);
+    } catch (error) {
+      console.error('Error clearing resources:', error);
+    }
+  }
+}
+
+function addResource(key, textAreaId, listId, type) {
   const lines = document.getElementById(textAreaId).value.trim().split('\n').map(l=>l.trim()).filter(l=>l);
   if(!lines.length) return;
   
   try {
-    const resourcesData = [];
+    const resourcesToAdd = [];
     for (const name of lines) {
       // Check if resource already exists
       const { data: existing } = await supabase
         .from('resources')
         .select('id')
+        .eq('user_email', currentUser)
+        .eq('type', key)
         .eq('name', name)
-        .eq('type', type)
         .single();
       
       if (!existing) {
-        resourcesData.push({
-          name: name,
-          type: type,
-          created_by: currentUser
+        const id = key+'_'+Date.now()+'_'+Math.random().toString(36).substr(2,5);
+        resourcesToAdd.push({
+          id: id,
+          user_email: currentUser,
+          type: key,
+          name: name
         });
       }
     }
     
-    if (resourcesData.length > 0) {
+    if (resourcesToAdd.length > 0) {
       const { error } = await supabase
         .from('resources')
-        .insert(resourcesData);
+        .insert(resourcesToAdd);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error adding resources:', error);
+        return;
+      }
     }
     
-    document.getElementById(textAreaId).value = '';
-    await render(key, listId, type);
+    document.getElementById(textAreaId).value='';
+    render(key, listId, type);
   } catch (error) {
     console.error('Error adding resources:', error);
   }
@@ -1126,20 +1441,24 @@ async function addResource(key, textAreaId, listId, type) {
 async function render(key, listId, type) {
   const pool = document.getElementById(listId);
   if (!pool) return;
-  pool.innerHTML = '';
+  pool.innerHTML='';
   
   try {
     const { data: resources, error } = await supabase
       .from('resources')
       .select('*')
-      .eq('type', type)
+      .eq('user_email', currentUser)
+      .eq('type', key)
       .order('name');
     
-    if (error) throw error;
+    if (error) {
+      console.error('Error loading resources:', error);
+      return;
+    }
     
-    resources.forEach(item => {
+    resources.forEach(item=>{
       const tile = document.createElement('div');
-      tile.className = 'tile ' + type;
+      tile.className = 'tile '+type;
       tile.id = item.id;
       tile.draggable = true;
       tile.ondragstart = drag;
@@ -1147,18 +1466,14 @@ async function render(key, listId, type) {
       const span = document.createElement('span');
       span.textContent = item.name;
       tile.appendChild(span);
-      
-      if (isAdmin) {
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = '×';
-        deleteBtn.className = 'delete-btn';
-        deleteBtn.onclick = (e) => {
-          e.stopPropagation();
-          deleteResource(item.id, type);
-        };
-        tile.appendChild(deleteBtn);
-      }
-      
+      // Add delete button
+      const del = document.createElement('button');
+      del.textContent = '❌';
+      del.onclick = (e) => { e.stopPropagation(); deleteResource(key, item.id, listId, type); };
+      const btnWrap = document.createElement('div');
+      btnWrap.className = 'tile-buttons';
+      btnWrap.appendChild(del);
+      tile.appendChild(btnWrap);
       pool.appendChild(tile);
     });
   } catch (error) {
@@ -1166,449 +1481,44 @@ async function render(key, listId, type) {
   }
 }
 
-async function deleteResource(id, type) {
-  if (!isAdmin) return;
-  
+async function deleteResource(key, id, listId, type) {
   try {
     const { error } = await supabase
       .from('resources')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .eq('user_email', currentUser);
     
-    if (error) throw error;
+    if (error) {
+      console.error('Error deleting resource:', error);
+      return;
+    }
     
-    // Re-render the appropriate list
-    const typeMap = {
-      'crew': ['crews', 'crewPool', 'crew'],
-      'truck': ['trucks', 'truckPool', 'truck'],
-      'trailer': ['trailers', 'trailerPool', 'trailer'],
-      'equipment': ['equipment', 'equipmentPool', 'equipment']
-    };
-    
-    const [key, listId, renderType] = typeMap[type] || [type + 's', type + 'Pool', type];
-    await render(key, listId, renderType);
+    render(key, listId, type);
   } catch (error) {
     console.error('Error deleting resource:', error);
   }
 }
 
-async function loadAllResources() {
-  await render('crews', 'crewPool', 'crew');
-  await render('trucks', 'truckPool', 'truck');
-  await render('trailers', 'trailerPool', 'trailer');
-  await render('equipment', 'equipmentPool', 'equipment');
-  await populateSavedFirst();
-  await populateSaved();
-}
-
-async function saveSchedule() {
-  const saveContainer = document.createElement('div');
-  saveContainer.setAttribute('data-content-type', 'board');
-  
-  const boardContent = document.createElement('div');
-  boardContent.innerHTML = document.getElementById('board').innerHTML;
-  saveContainer.appendChild(boardContent);
-  
-  ['off-box', 'available-box', 'shop-box', 'djmuse-box'].forEach(boxId => {
-    const boxContent = document.createElement('div');
-    boxContent.setAttribute('data-content-type', boxId);
-    boxContent.innerHTML = document.getElementById(boxId).innerHTML;
-    saveContainer.appendChild(boxContent);
-  });
-  
-  try {
-    const { error } = await supabase
-      .from('schedules')
-      .insert({
-        schedule_data: { html: saveContainer.innerHTML },
-        created_by: currentUser
-      });
-    
-    if (error) throw error;
-    
-    await populateSavedFirst();
-    await populateSaved();
-  } catch (error) {
-    console.error('Error saving schedule:', error);
-  }
-}
-
-async function populateSavedFirst() {
-  const sel = document.getElementById('savedSelectFirst');
-  sel.innerHTML = '';
-  
-  try {
-    const { data: schedules, error } = await supabase
-      .from('schedules')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(50);
-    
-    if (error) throw error;
-    
-    schedules.forEach((s, i) => {
-      sel.append(new Option(new Date(s.created_at).toLocaleString(), s.id));
-    });
-  } catch (error) {
-    console.error('Error loading saved schedules:', error);
-  }
-}
-
-async function populateSaved() {
-  const sel = document.getElementById('savedSelect');
-  sel.innerHTML = '';
-  
-  try {
-    const { data: schedules, error } = await supabase
-      .from('schedules')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(50);
-    
-    if (error) throw error;
-    
-    schedules.forEach((s, i) => {
-      sel.append(new Option(new Date(s.created_at).toLocaleString(), s.id));
-    });
-  } catch (error) {
-    console.error('Error loading saved schedules:', error);
-  }
-}
-
-async function loadSaved() {
-  const selFirst = document.getElementById('savedSelectFirst');
-  const sel = selFirst && selFirst.value !== '' ? selFirst : document.getElementById('savedSelect');
-  const scheduleId = sel.value;
-  
-  try {
-    const { data: schedule, error } = await supabase
-      .from('schedules')
-      .select('*')
-      .eq('id', scheduleId)
-      .single();
-    
-    if (error) throw error;
-    
-    const tmp = document.createElement('div');
-    tmp.innerHTML = schedule.schedule_data.html;
-    
-    const boardContent = tmp.querySelector('[data-content-type="board"]');
-    if (boardContent) {
-      document.getElementById('board').innerHTML = boardContent.innerHTML;
-    }
-    
-    ['off-box', 'available-box', 'shop-box', 'djmuse-box'].forEach(boxId => {
-      const boxContent = tmp.querySelector(`[data-content-type="${boxId}"]`);
-      if (boxContent) {
-        document.getElementById(boxId).innerHTML = boxContent.innerHTML;
-      }
-    });
-    
-    setupDragAndDrop();
-  } catch (error) {
-    console.error('Error loading schedule:', error);
-  }
-}
-
-async function exportToPDF() {
-  const { jsPDF } = window.jspdf;
-  
-  try {
-    const element = document.getElementById('board');
-    const canvas = await html2canvas(element, {
-      scale: 3, // High resolution
-      useCORS: true,
-      allowTaint: true,
-      backgroundColor: '#ffffff'
-    });
-    
-    const imgData = canvas.toDataURL('image/png');
-    const imgWidth = canvas.width;
-    const imgHeight = canvas.height;
-    
-    // Calculate PDF dimensions
-    const ratio = imgWidth / imgHeight;
-    let pdfWidth, pdfHeight;
-    
-    if (ratio > 1) {
-      // Landscape
-      pdfWidth = 297; // A4 landscape width in mm
-      pdfHeight = 297 / ratio;
-    } else {
-      // Portrait
-      pdfWidth = 210; // A4 portrait width in mm
-      pdfHeight = 210 / ratio;
-    }
-    
-    const pdf = new jsPDF(ratio > 1 ? 'landscape' : 'portrait', 'mm', 'a4');
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-    
-    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-    pdf.save(`schedule-${timestamp}.pdf`);
-  } catch (error) {
-    console.error('Error exporting PDF:', error);
-    alert('Error exporting PDF. Please try again.');
-  }
-}
-
-window.addEventListener('load', async () => {
-  // Check if user is already logged in
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session) {
-    // Auto-login if session exists
-    const { data: userData } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', session.user.email)
-      .single();
-    
-    if (userData) {
-      currentUser = userData.username;
-      isAdmin = userData.role === 'admin';
-      document.getElementById('loginPage').style.display = 'none';
-      document.getElementById('appContainer').style.display = 'block';
-      document.getElementById('currentUser').textContent = currentUser;
-      document.getElementById('userRole').textContent = userData.role;
-      await loadAllResources();
-    }
-  }
-});
-
-// Basic drag & drop
-function allowDrop(ev) {
-  ev.preventDefault();
-}
-
-function drag(ev) {
-  ev.dataTransfer.setData('text', ev.target.id);
-  
-  // Store the type of element being dragged
-  if (ev.target.classList.contains('tile')) {
-    ev.dataTransfer.setData('type', 'tile');
-  } else if (ev.target.classList.contains('column')) {
-    ev.dataTransfer.setData('type', 'column');
-    ev.dataTransfer.setData('columnId', ev.target.id);
-  }
-}
-
-// Modified: Only columns can use this function
-function dragColumn(ev) {
-  // Only allow columns to be dragged as columns
-  if (ev.target.classList.contains('column')) {
-    ev.dataTransfer.setData('type', 'column');
-    ev.dataTransfer.setData('columnId', ev.target.id);
-  }
-}
-
-function findClosestColumn(x) {
-  const columns = Array.from(document.querySelectorAll('#board .column'));
-  
-  // Sort columns by their distance from the drop point
-  columns.sort((a, b) => {
-    const rectA = a.getBoundingClientRect();
-    const rectB = b.getBoundingClientRect();
-    const distA = Math.abs(rectA.left - x);
-    const distB = Math.abs(rectB.left - x);
-    return distA - distB;
-  });
-  
-  // If the drop point is to the right of the closest column, insert after it
-  if (columns.length > 0) {
-    const closest = columns[0];
-    const rect = closest.getBoundingClientRect();
-    
-    if (x > rect.left + rect.width / 2) {
-      return closest.nextElementSibling;
-    } else {
-      return closest;
-    }
-  }
-  
-  return null;
-}
-
-function drop(ev) {
-  ev.preventDefault();
-  const id = ev.dataTransfer.getData('text');
-  const type = ev.dataTransfer.getData('type');
-  const columnId = ev.dataTransfer.getData('columnId');
-  
-  // If this is a column being dragged
-  if (type === 'column') {
-    const column = document.getElementById(columnId);
-    const board = document.getElementById('board');
-    
-    // Find the closest column to determine insertion point
-    const closestColumn = findClosestColumn(ev.clientX);
-    
-    if (closestColumn) {
-      board.insertBefore(column, closestColumn);
-    } else {
-      board.appendChild(column);
-    }
-    
-    saveSchedule();
-    return;
-  }
-  
-  // Original tile drop code follows
-  const orig = document.getElementById(id);
-  if (!orig) return;
-  
-  // Fix: Only allow tiles to be dropped in columns, resource lists, or permanent boxes
-  // Prevent tiles from being treated like columns
-  if (!orig.classList.contains('tile')) return;
-  
-  const col = ev.target.closest('.column') || ev.target.closest('.resource-list') || ev.target.closest('.permanent-box');
-  if (col) {
-    // Check if this is a combo being dropped into a column
-    if (orig.classList.contains('combo') && (col.closest('.column') || col.closest('.permanent-box'))) {
-      // Break apart the combo into individual resources
-      const resources = JSON.parse(orig.getAttribute('data-resources') || '[]');
-      resources.forEach(resource => {
-        // Create a tile for each resource in the combo
-        const tile = document.createElement('div');
-        tile.className = 'tile ' + resource.type;
-        tile.id = resource.type + '_from_combo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-        tile.draggable = true;
-        tile.ondragstart = drag;
-        
-        const span = document.createElement('span');
-        span.textContent = resource.name;
-        tile.appendChild(span);
-        
-        // Add buttons
-        const btns = document.createElement('div');
-        btns.className = 'tile-buttons';
-        const ret = document.createElement('button');
-        ret.textContent = '↩️';
-        ret.onclick = () => returnTile(tile.id);
-        const del = document.createElement('button');
-        del.textContent = '❌';
-        del.onclick = () => delSiteTile(tile.id);
-        btns.appendChild(ret);
-        btns.appendChild(del);
-        tile.appendChild(btns);
-        
-        col.appendChild(tile);
-      });
+async function clearResource(key, listId, type) {
+  if (confirm('Clear all ' + key + '?')) {
+    try {
+      const { error } = await supabase
+        .from('resources')
+        .delete()
+        .eq('user_email', currentUser)
+        .eq('type', key);
       
-      // Remove the combo tile
-      orig.remove();
-    } else {
-      col.appendChild(orig);
-      
-      // Add buttons if in a column or permanent box
-      if (col.closest('.column') || col.closest('.permanent-box')) {
-        if (!orig.querySelector('.tile-buttons')) {
-          const btns = document.createElement('div');
-          btns.className = 'tile-buttons';
-          const ret = document.createElement('button');
-          ret.textContent = '↩️';
-          ret.onclick = () => returnTile(id);
-          const del = document.createElement('button');
-          del.textContent = '❌';
-          del.onclick = () => delSiteTile(id);
-          btns.appendChild(ret);
-          btns.appendChild(del);
-          orig.appendChild(btns);
-          
-          // Check for permanent combos if this is a crew
-          if (orig.classList.contains('crew')) {
-            checkForPermanentCombos(orig, col);
-          }
-        }
-      } else {
-        // Remove buttons if returned to resource list
-        const btns = orig.querySelector('.tile-buttons');
-        if (btns) btns.remove();
+      if (error) {
+        console.error('Error clearing resources:', error);
+        return;
       }
+      
+      render(key, listId, type);
+    } catch (error) {
+      console.error('Error clearing resources:', error);
     }
-    
-    saveSchedule();
   }
-}
-
-function dropLocation(ev, location) {
-  ev.preventDefault();
-  const id = ev.dataTransfer.getData('text');
-  const type = ev.dataTransfer.getData('type');
-  
-  // Fix: Only allow tiles to be dropped in location zones
-  // Prevent tiles from being treated like columns
-  if (type !== 'tile') return;
-  
-  const orig = document.getElementById(id);
-  if (!orig) return;
-  
-  const zone = ev.target.closest('.location-zone');
-  if (zone) {
-    zone.appendChild(orig);
-    
-    // Add location attribute
-    orig.setAttribute('data-location', location);
-    
-    // Add buttons if not already there
-    if (!orig.querySelector('.tile-buttons')) {
-      const btns = document.createElement('div');
-      btns.className = 'tile-buttons';
-      const ret = document.createElement('button');
-      ret.textContent = '↩️';
-      ret.onclick = () => returnTileToResourceList(id);
-      const del = document.createElement('button');
-      del.textContent = '❌';
-      del.onclick = () => delSiteTile(id);
-      btns.appendChild(ret);
-      btns.appendChild(del);
-      orig.appendChild(btns);
-    }
-    
-    // Save location data
-    saveLocationData();
-  }
-}
-
-// Resources
-function addResource(key, textAreaId, listId, type) {
-  const lines = document.getElementById(textAreaId).value.trim().split('\n').map(l=>l.trim()).filter(l=>l);
-  if(!lines.length) return;
-  let arr = JSON.parse(localStorage.getItem(key)||'[]');
-  lines.forEach(name=>{
-    if(!arr.some(item=>item.name===name)) {
-      const id = key+'_'+Date.now()+'_'+Math.random().toString(36).substr(2,5);
-      arr.push({id,name});
-    }
-  });
-  localStorage.setItem(key, JSON.stringify(arr));
-  document.getElementById(textAreaId).value='';
-  render(key, listId, type);
-}
-
-function render(key, listId, type) {
-  const pool = document.getElementById(listId);
-  if (!pool) return;
-  pool.innerHTML='';
-  const arr = JSON.parse(localStorage.getItem(key)||'[]');
-  arr.forEach(item=>{
-    const tile = document.createElement('div');
-    tile.className = 'tile '+type;
-    tile.id = item.id;
-    tile.draggable = true;
-    tile.ondragstart = drag;
-    tile.onclick = toggleSelection;
-    const span = document.createElement('span');
-    span.textContent = item.name;
-    tile.appendChild(span);
-    // Add delete button
-    const del = document.createElement('button');
-    del.textContent = '❌';
-    del.onclick = (e) => { e.stopPropagation(); deleteResource(key, item.id, listId, type); };
-    const btnWrap = document.createElement('div');
-    btnWrap.className = 'tile-buttons';
-    btnWrap.appendChild(del);
-    tile.appendChild(btnWrap);
-    pool.appendChild(tile);
-  });
 }
 
 function addCrew(){ addResource('crews','crewInput','crewList','crew'); }
@@ -1620,150 +1530,12 @@ function renderTrailer(){ render('trailers','trailerList','trailer'); }
 function addEquipment(){ addResource('equipment','equipmentInput','equipmentList','equipment'); }
 function renderEquipment(){ render('equipment','equipmentList','equipment'); }
 
-function renderCombos() {
-  const combos = JSON.parse(localStorage.getItem('combos') || '[]');
-  const comboList = document.getElementById('comboList');
-  
-  if (comboList) {
-    comboList.innerHTML = '';
-    
-    combos.forEach(combo => {
-      const tile = document.createElement('div');
-      tile.className = 'tile combo';
-      tile.id = combo.id;
-      tile.draggable = true;
-      tile.ondragstart = drag;
-      tile.onclick = toggleSelection;
-      
-      const span = document.createElement('span');
-      span.textContent = combo.name;
-      tile.appendChild(span);
-      
-      // Store combo data
-      tile.setAttribute('data-resources', JSON.stringify(combo.resources));
-      
-      comboList.appendChild(tile);
-    });
-  }
-}
+function clearCrew() { clearResource('crews','crewList','crew'); }
+function clearTruck() { clearResource('trucks','truckList','truck'); }
+function clearTrailer() { clearResource('trailers','trailerList','trailer'); }
+function clearEquipment() { clearResource('equipment','equipmentList','equipment'); }
 
-function returnTile(id) {
-  const tile = document.getElementById(id);
-  if (!tile) return;
-  
-  // Determine the correct list to return to
-  let listId;
-  if (tile.classList.contains('crew')) listId = 'crewList';
-  else if (tile.classList.contains('truck')) listId = 'truckList';
-  else if (tile.classList.contains('trailer')) listId = 'trailerList';
-  else if (tile.classList.contains('equipment')) listId = 'equipmentList';
-  else if (tile.classList.contains('combo')) listId = 'comboList';
-  else return;
-  
-  const list = document.getElementById(listId);
-  if (list) {
-    list.appendChild(tile);
-    
-    // Remove tile-buttons
-    const btns = tile.querySelector('.tile-buttons');
-    if(btns) btns.remove();
-    
-    saveSchedule();
-  }
-}
-
-function returnTileToResourceList(id) {
-  const tile = document.getElementById(id);
-  if (!tile) return;
-  
-  // Determine the correct list to return to
-  let listId;
-  if (tile.classList.contains('crew')) listId = 'crewList';
-  else if (tile.classList.contains('truck')) listId = 'truckList';
-  else if (tile.classList.contains('trailer')) listId = 'trailerList';
-  else if (tile.classList.contains('equipment')) listId = 'equipmentList';
-  else if (tile.classList.contains('combo')) listId = 'comboList';
-  else return;
-  
-  const list = document.getElementById(listId);
-  if (list) {
-    list.appendChild(tile);
-    
-    // Remove tile-buttons
-    const btns = tile.querySelector('.tile-buttons');
-    if(btns) btns.remove();
-    
-    saveLocationData();
-  }
-}
-
-function delSiteTile(id) {
-  const tile = document.getElementById(id);
-  if(tile) tile.remove();
-  saveSchedule();
-  saveLocationData();
-}
-
-// Sites
-let siteCount = 0;
-function addSite() {
-  const name = prompt('Site name:');
-  if(!name) return;
-  const col = document.createElement('div');
-  col.className = 'column';
-  col.id = 'site_' + siteCount++;
-  col.ondragover = allowDrop;
-  col.ondrop = drop;
-  col.onclick = toggleColumnSelection; // Add this line
-  col.draggable = true; // Make column draggable
-  col.ondragstart = dragColumn; // Add drag handler
-  const inp = document.createElement('input');
-  inp.value = name;
-  inp.onclick = (e) => e.stopPropagation(); // Prevent input clicks from selecting column
-  col.appendChild(inp);
-  document.getElementById('board').appendChild(col);
-  saveSchedule();
-}
-
-function deleteSite() {
-  // Check if any column is selected
-  const selectedColumns = document.querySelectorAll('.column.selected');
-  
-  if (selectedColumns.length === 0) {
-    alert('Please select a site to delete first');
-    return;
-  }
-  
-  // Delete all selected columns
-  selectedColumns.forEach(column => {
-    column.remove();
-  });
-  
-  saveSchedule();
-}
-
-function clearSites(){
-  document.querySelectorAll('.column').forEach(c=>c.remove());
-  renderAll();
-  saveSchedule();
-}
-
-function eraseBoard(){
-  localStorage.removeItem('crews');
-  localStorage.removeItem('trucks');
-  localStorage.removeItem('trailers');
-  localStorage.removeItem('equipment');
-  localStorage.removeItem('scheds');
-  localStorage.removeItem('combos');
-  localStorage.removeItem('locations');
-  document.querySelectorAll('.column').forEach(c=>c.remove());
-  renderAll();
-  populateSavedFirst();
-  clearLocationBoard();
-}
-
-// Save/Load
-function autoSave() {
+async function autoSave() {
   // Make sure all input values are reflected in their value attributes before saving
   document.querySelectorAll('#board .column input').forEach(input => {
     input.setAttribute('value', input.value);
@@ -1786,269 +1558,145 @@ function autoSave() {
     saveContainer.appendChild(boxContent);
   });
   
-  let scheds = JSON.parse(localStorage.getItem('scheds')||'[]');
-  scheds.unshift({time:new Date().toLocaleString(), html:saveContainer.innerHTML});
-  if (scheds.length > 50) scheds = scheds.slice(0, 50);
-  localStorage.setItem('scheds',JSON.stringify(scheds));
-  populateSavedFirst();
-  populateSaved();
+  try {
+    const { error } = await supabase
+      .from('schedules')
+      .insert([{
+        user_email: currentUser,
+        html_content: saveContainer.innerHTML,
+        created_at: new Date().toISOString()
+      }]);
+    
+    if (error) {
+      console.error('Error saving schedule:', error);
+      return;
+    }
+    
+    populateSavedFirst();
+    populateSaved();
+  } catch (error) {
+    console.error('Error auto-saving:', error);
+  }
 }
 
-function populateSavedFirst(){
+async function populateSavedFirst(){
   const sel = document.getElementById('savedSelectFirst');
   sel.innerHTML='';
-  JSON.parse(localStorage.getItem('scheds')||'[]').forEach((s,i)=>{
-    sel.append(new Option(s.time,i));
-  });
+  
+  try {
+    const { data: schedules, error } = await supabase
+      .from('schedules')
+      .select('id, created_at')
+      .eq('user_email', currentUser)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    
+    if (error) {
+      console.error('Error loading schedules:', error);
+      return;
+    }
+    
+    schedules.forEach((s,i)=>{
+      sel.append(new Option(new Date(s.created_at).toLocaleString(), s.id));
+    });
+  } catch (error) {
+    console.error('Error populating saved schedules:', error);
+  }
 }
 
-function populateSaved(){
+async function populateSaved(){
   const sel = document.getElementById('savedSelect');
   sel.innerHTML='';
-  JSON.parse(localStorage.getItem('scheds')||'[]').forEach((s,i)=>{
-    sel.append(new Option(s.time,i));
-  });
+  
+  try {
+    const { data: schedules, error } = await supabase
+      .from('schedules')
+      .select('id, created_at')
+      .eq('user_email', currentUser)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    
+    if (error) {
+      console.error('Error loading schedules:', error);
+      return;
+    }
+    
+    schedules.forEach((s,i)=>{
+      sel.append(new Option(new Date(s.created_at).toLocaleString(), s.id));
+    });
+  } catch (error) {
+    console.error('Error populating saved schedules:', error);
+  }
 }
 
-function loadSaved() {
+async function loadSaved() {
   const selFirst = document.getElementById('savedSelectFirst');
   const sel = selFirst && selFirst.value!=='' ? selFirst : document.getElementById('savedSelect');
-  const idx = sel.value;
-  const scheds = JSON.parse(localStorage.getItem('scheds')||'[]');
+  const scheduleId = sel.value;
   
-  if(scheds[idx]) {
-    const tmp = document.createElement('div');
-    tmp.innerHTML = scheds[idx].html;
+  if (!scheduleId) return;
+  
+  try {
+    const { data: schedule, error } = await supabase
+      .from('schedules')
+      .select('html_content')
+      .eq('id', scheduleId)
+      .eq('user_email', currentUser)
+      .single();
     
-    // Load board content
-    const boardContent = tmp.querySelector('[data-content-type="board"]');
-    if (boardContent) {
-      document.getElementById('board').innerHTML = boardContent.innerHTML;
-    } else {
-      // Fallback for older saved data
-      document.getElementById('board').innerHTML = scheds[idx].html;
+    if (error) {
+      console.error('Error loading schedule:', error);
+      return;
     }
     
-    // Load permanent boxes content
-    ['off-box', 'available-box', 'shop-box', 'djmuse-box'].forEach(boxId => {
-      const boxContent = tmp.querySelector(`[data-content-type="${boxId}"]`);
-      if (boxContent) {
-        document.getElementById(boxId).innerHTML = boxContent.innerHTML;
-      }
-    });
-    
-    // Reattach event handlers to loaded elements
-    document.querySelectorAll('#board .column').forEach(col => {
-      col.ondragover = allowDrop;
-      col.ondrop = drop;
-      col.onclick = toggleColumnSelection;
-      col.draggable = true;
-      col.ondragstart = dragColumn;
-    });
-    
-    document.querySelectorAll('#board .tile, .permanent-box .tile').forEach(tile => {
-      tile.draggable = true;
-      tile.ondragstart = drag;
+    if (schedule) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = schedule.html_content;
       
-      // Reattach button event handlers
-      const returnBtn = tile.querySelector('.tile-buttons button:first-child');
-      if (returnBtn) returnBtn.onclick = () => returnTile(tile.id);
-      
-      const delBtn = tile.querySelector('.tile-buttons button:last-child');
-      if (delBtn) delBtn.onclick = () => delSiteTile(tile.id);
-    });
-  }
-}
-
-// Snapshot
-function saveSnapshot(){
-  autoSave();
-  try {
-    html2canvas(document.getElementById('board')).then(canvas=>{
-      const a = document.createElement('a');
-      a.download = 'snapshot_' + new Date().toISOString() + '.png';
-      a.href = canvas.toDataURL();
-      a.click();
-    });
-  } catch (e) {
-    console.error("Error creating snapshot:", e);
-    alert("Error creating snapshot. Please make sure html2canvas is loaded correctly.");
-  }
-}
-
-// Page 2: Saved Schedules functions
-function loadSavedPage2() {
-  const idx = document.getElementById('savedSelect').value;
-  const scheds = JSON.parse(localStorage.getItem('scheds') || '[]');
-  const disp = document.getElementById('savedBoardDisplay');
-  disp.innerHTML = '';
-  
-  if (scheds[idx]) {
-    const tmp = document.createElement('div');
-    tmp.innerHTML = scheds[idx].html;
-    
-    // Append all columns side by side
-    tmp.querySelectorAll('.column').forEach(c => {
-      const clone = c.cloneNode(true);
-      
-      // Make sure input values are preserved
-      const origInput = c.querySelector('input');
-      if (origInput) {
-        const cloneInput = clone.querySelector('input');
-        if (cloneInput) {
-          // Explicitly set the value attribute and the value property
-          cloneInput.setAttribute('value', origInput.value);
-          cloneInput.value = origInput.value;
-        }
+      // Load board content
+      const boardContent = tmp.querySelector('[data-content-type="board"]');
+      if (boardContent) {
+        document.getElementById('board').innerHTML = boardContent.innerHTML;
+      } else {
+        // Fallback for older saved data
+        document.getElementById('board').innerHTML = schedule.html_content;
       }
       
-      disp.appendChild(clone);
-    });
-  }
-}
-
-function saveSnapshotPage2() {
-  try {
-    html2canvas(document.getElementById('savedBoardDisplay')).then(canvas => {
-      const a = document.createElement('a');
-      a.download = 'saved_snapshot_' + new Date().toISOString() + '.png';
-      a.href = canvas.toDataURL();
-      a.click();
-    });
-  } catch (e) {
-    console.error("Error creating snapshot:", e);
-    alert("Error creating snapshot. Please make sure html2canvas is loaded correctly.");
-  }
-}
-
-function clearSavedLogs() {
-  localStorage.removeItem('scheds');
-  document.getElementById('savedBoardDisplay').innerHTML = '';
-  populateSaved();
-}
-
-// Combo functionality
-function toggleSelection() {
-  this.classList.toggle('selected');
-}
-
-function toggleColumnSelection(event) {
-  // Only toggle if the click was directly on the column, not on a child element
-  if (event.target === this) {
-    this.classList.toggle('selected');
-  }
-}
-
-function addCombo() {
-  const comboName = document.getElementById('comboName').value.trim();
-  if (!comboName) {
-    alert('Please enter a combo name');
-    return;
-  }
-  
-  // Get selected resources
-  const selectedTiles = document.querySelectorAll('.resource-list .tile.selected');
-  if (selectedTiles.length < 2) {
-    alert('Please select at least 2 resources for the combo');
-    return;
-  }
-  
-  // Create combo
-  const comboId = 'combo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-  
-  // Collect resources in the combo
-  const resources = [];
-  selectedTiles.forEach(tile => {
-    resources.push({
-      id: tile.id,
-      type: Array.from(tile.classList).find(c => c !== 'tile' && c !== 'selected'),
-      name: tile.querySelector('span').textContent
-    });
-    
-    // Remove selection
-    tile.classList.remove('selected');
-    
-    // Remove the tile from resource list
-    tile.remove();
-  });
-  
-  // Save combo
-  let combos = JSON.parse(localStorage.getItem('combos') || '[]');
-  combos.push({
-    id: comboId,
-    name: comboName,
-    resources: resources
-  });
-  localStorage.setItem('combos', JSON.stringify(combos));
-  
-  // Create combo tile
-  const comboTile = document.createElement('div');
-  comboTile.className = 'tile combo';
-  comboTile.id = comboId;
-  comboTile.draggable = true;
-  comboTile.ondragstart = drag;
-  comboTile.onclick = toggleSelection;
-  
-  const span = document.createElement('span');
-  span.textContent = comboName;
-  comboTile.appendChild(span);
-  
-  // Store combo data
-  comboTile.setAttribute('data-resources', JSON.stringify(resources));
-  
-  // Add to combo list
-  document.getElementById('comboList').appendChild(comboTile);
-  
-  // Clear combo name input
-  document.getElementById('comboName').value = '';
-}
-
-function checkForPermanentCombos(crewTile, column) {
-  // Get crew name
-  const crewName = crewTile.querySelector('span').textContent;
-  
-  // Check if this crew has any permanent combos
-  const combos = JSON.parse(localStorage.getItem('combos') || '[]');
-  
-  combos.forEach(combo => {
-    // Check if this combo contains this crew
-    const hasCrew = combo.resources.some(res => 
-      res.type === 'crew' && res.name === crewName
-    );
-    
-    if (hasCrew) {
-      // Add other resources from this combo to the column
-      combo.resources.forEach(res => {
-        if (res.type !== 'crew' || res.name !== crewName) {
-          // Create a tile for this resource
-          const tile = document.createElement('div');
-          tile.className = 'tile ' + res.type;
-          tile.id = res.type + '_combo_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-          tile.draggable = true;
-          tile.ondragstart = drag;
-          
-          const span = document.createElement('span');
-          span.textContent = res.name + ' (with ' + crewName + ')';
-          tile.appendChild(span);
-          
-          // Add buttons
-          const btns = document.createElement('div');
-          btns.className = 'tile-buttons';
-          const del = document.createElement('button');
-          del.textContent = '❌';
-          del.onclick = () => delSiteTile(tile.id);
-          btns.appendChild(del);
-          tile.appendChild(btns);
-          
-          column.appendChild(tile);
+      // Load permanent boxes content
+      ['off-box', 'available-box', 'shop-box', 'djmuse-box'].forEach(boxId => {
+        const boxContent = tmp.querySelector(`[data-content-type="${boxId}"]`);
+        if (boxContent) {
+          document.getElementById(boxId).innerHTML = boxContent.innerHTML;
         }
       });
+      
+      // Reattach event handlers to loaded elements
+      document.querySelectorAll('#board .column').forEach(col => {
+        col.ondragover = allowDrop;
+        col.ondrop = drop;
+        col.onclick = toggleColumnSelection;
+        col.draggable = true;
+        col.ondragstart = dragColumn;
+      });
+      
+      document.querySelectorAll('#board .tile, .permanent-box .tile').forEach(tile => {
+        tile.draggable = true;
+        tile.ondragstart = drag;
+        
+        // Reattach button event handlers
+        const returnBtn = tile.querySelector('.tile-buttons button:first-child');
+        if (returnBtn) returnBtn.onclick = () => returnTile(tile.id);
+        
+        const delBtn = tile.querySelector('.tile-buttons button:last-child');
+        if (delBtn) delBtn.onclick = () => delSiteTile(tile.id);
+      });
     }
-  });
+  } catch (error) {
+    console.error('Error loading saved schedule:', error);
+  }
 }
 
-// Location functions
-function saveLocationData() {
+async function saveLocationData() {
   const locations = {
     KC: [],
     Indy: [],
@@ -2066,50 +1714,80 @@ function saveLocationData() {
     });
   });
   
-  localStorage.setItem('locations', JSON.stringify(locations));
+  try {
+    const { error } = await supabase
+      .from('locations')
+      .upsert([{
+        user_email: currentUser,
+        location_data: JSON.stringify(locations)
+      }], {
+        onConflict: 'user_email'
+      });
+    
+    if (error) {
+      console.error('Error saving location data:', error);
+    }
+  } catch (error) {
+    console.error('Error saving location data:', error);
+  }
 }
 
-function loadLocationData() {
-  const locations = JSON.parse(localStorage.getItem('locations') || '{}');
-  
-  // Clear all zones
-  document.querySelectorAll('.location-zone').forEach(zone => {
-    // Keep only the h3 header
-    const header = zone.querySelector('h3');
-    zone.innerHTML = '';
-    zone.appendChild(header);
-  });
-  
-  // Load data into each zone
-  Object.keys(locations).forEach(location => {
-    let zoneId;
-    if (location === 'KC') zoneId = 'kc-zone';
-    else if (location === 'Indy') zoneId = 'indy-zone';
-    else if (location === 'STL') zoneId = 'stl-zone';
-    else return;
+async function loadLocationData() {
+  try {
+    const { data: locationRecord, error } = await supabase
+      .from('locations')
+      .select('location_data')
+      .eq('user_email', currentUser)
+      .single();
     
-    const zone = document.getElementById(zoneId);
-    if (!zone) return;
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error loading location data:', error);
+      return;
+    }
     
-    locations[location].forEach(item => {
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = item.html;
-      const tile = tempDiv.firstChild;
-      
-      // Make sure it's draggable and has event handlers
-      tile.draggable = true;
-      tile.ondragstart = drag;
-      
-      // Reattach button event handlers
-      const returnBtn = tile.querySelector('.tile-buttons button:first-child');
-      if (returnBtn) returnBtn.onclick = () => returnTileToResourceList(item.id);
-      
-      const delBtn = tile.querySelector('.tile-buttons button:last-child');
-      if (delBtn) delBtn.onclick = () => delSiteTile(item.id);
-      
-      zone.appendChild(tile);
+    const locations = locationRecord ? JSON.parse(locationRecord.location_data) : {};
+    
+    // Clear all zones
+    document.querySelectorAll('.location-zone').forEach(zone => {
+      // Keep only the h3 header
+      const header = zone.querySelector('h3');
+      zone.innerHTML = '';
+      zone.appendChild(header);
     });
-  });
+    
+    // Load data into each zone
+    Object.keys(locations).forEach(location => {
+      let zoneId;
+      if (location === 'KC') zoneId = 'kc-zone';
+      else if (location === 'Indy') zoneId = 'indy-zone';
+      else if (location === 'STL') zoneId = 'stl-zone';
+      else return;
+      
+      const zone = document.getElementById(zoneId);
+      if (!zone) return;
+      
+      locations[location].forEach(item => {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = item.html;
+        const tile = tempDiv.firstChild;
+        
+        // Make sure it's draggable and has event handlers
+        tile.draggable = true;
+        tile.ondragstart = drag;
+        
+        // Reattach button event handlers
+        const returnBtn = tile.querySelector('.tile-buttons button:first-child');
+        if (returnBtn) returnBtn.onclick = () => returnTileToResourceList(item.id);
+        
+        const delBtn = tile.querySelector('.tile-buttons button:last-child');
+        if (delBtn) delBtn.onclick = () => delSiteTile(item.id);
+        
+        zone.appendChild(tile);
+      });
+    });
+  } catch (error) {
+    console.error('Error loading location data:', error);
+  }
 }
 
 function clearLocationBoard() {
@@ -2249,13 +1927,9 @@ function initTouchSupport() {
   }
 }
 
-// Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-  // Don't auto-render until login
-  // renderAll();
-  // populateSavedFirst();
-  // populateSaved();
-  // loadLocationData();
+  // Check authentication session on load
+  checkAuthSession();
   
   // Make all resource tiles selectable for combos
   document.querySelectorAll('.resource-list .tile').forEach(tile => {
@@ -2271,143 +1945,243 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize touch support for mobile devices
   initTouchSupport();
 });
-
-// PDF Export function for Page 1
-function exportPDF() {
-    // Ensure jsPDF is loaded
-    if (typeof jsPDF === 'undefined') {
-        alert('jsPDF library is required for PDF export. Please include it in your project.');
-        return;
-    }
-
-    // Get the board element
-    const board = document.getElementById('board');
-
-    // Check if the board element exists
-    if (!board) {
-        alert('Board element not found.');
-        return;
-    }
-
-    // Use html2canvas to render the board as a canvas
-    html2canvas(board, {
-        scale: 2, // Increase scale for higher resolution
-        useCORS: true // Enable CORS if dealing with images from different domains
-    }).then(canvas => {
-        // Calculate the image data
-        const imgData = canvas.toDataURL('image/png');
-
-        // Initialize jsPDF with specified orientation and units
-        const pdf = new jsPDF('landscape', 'mm', 'a4');
-
-        // Calculate image dimensions to fit the PDF
-        const imgWidth = pdf.internal.pageSize.getWidth();
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-        // Add the image to the PDF
-        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-
-        // Save the PDF
-        pdf.save('weekly_schedule.pdf');
-    }).catch(error => {
-        console.error('Error exporting PDF:', error);
-        alert('Error exporting PDF. Please check the console for details.');
-    });
-}
-
-// PDF Export function for Page 2
-function exportPDFPage2() {
-    // Ensure jsPDF is loaded
-    if (typeof jsPDF === 'undefined') {
-        alert('jsPDF library is required for PDF export. Please include it in your project.');
-        return;
-    }
-
-    // Get the savedBoardDisplay element
-    const savedBoardDisplay = document.getElementById('savedBoardDisplay');
-
-    // Check if the savedBoardDisplay element exists
-    if (!savedBoardDisplay) {
-        alert('savedBoardDisplay element not found.');
-        return;
-    }
-
-    // Use html2canvas to render the savedBoardDisplay as a canvas
-    html2canvas(savedBoardDisplay, {
-        scale: 2, // Increase scale for higher resolution
-        useCORS: true // Enable CORS if dealing with images from different domains
-    }).then(canvas => {
-        // Calculate the image data
-        const imgData = canvas.toDataURL('image/png');
-
-        // Initialize jsPDF with specified orientation and units
-        const pdf = new jsPDF('landscape', 'mm', 'a4');
-
-        // Calculate image dimensions to fit the PDF
-        const imgWidth = pdf.internal.pageSize.getWidth();
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-        // Add the image to the PDF
-        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-
-        // Save the PDF
-        pdf.save('saved_schedules.pdf');
-    }).catch(error => {
-        console.error('Error exporting PDF:', error);
-        alert('Error exporting PDF. Please check the console for details.');
-    });
-}
-
-function showForgotPassword() {
-  document.getElementById('forgotPasswordModal').style.display = 'block';
-}
-
-function closeForgotPassword() {
-  document.getElementById('forgotPasswordModal').style.display = 'none';
-  document.getElementById('resetUsername').value = '';
-  document.getElementById('resetMessage').style.display = 'none';
-}
-
-async function requestPasswordReset() {
-  const username = document.getElementById('resetUsername').value;
-  
-  if (!username) {
-    document.getElementById('resetMessage').textContent = 'Please enter your username';
-    document.getElementById('resetMessage').style.color = '#e74c3c';
-    document.getElementById('resetMessage').style.display = 'block';
-    return;
-  }
-  
-  try {
-    const { error } = await supabase.auth.resetPasswordForEmail(username + '@rnstower.com', {
-      redirectTo: window.location.origin
-    });
-    
-    if (error) throw error;
-    
-    document.getElementById('resetMessage').textContent = 'Password reset email sent! Check your inbox.';
-    document.getElementById('resetMessage').style.color = '#27ae60';
-    document.getElementById('resetMessage').style.display = 'block';
-    
-    setTimeout(() => {
-      closeForgotPassword();
-    }, 3000);
-    
-  } catch (error) {
-    console.error('Password reset error:', error);
-    document.getElementById('resetMessage').textContent = 'Error sending reset email. Please try again.';
-    document.getElementById('resetMessage').style.color = '#e74c3c';
-    document.getElementById('resetMessage').style.display = 'block';
-  }
-}
 </script>
 
-<!-- Added jsPDF library for PDF export -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
+  <!-- Cloud sync injection -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="/js/cloud.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://ldbjgdfkjnpxwvrofmkx.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkYmpnZGZram5weHd2cm9mbWt4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4OTMwMTYsImV4cCI6MjA3MDQ2OTAxNn0.2DeJq25bo_3nKG_PhkWaUUssVjUqQSRqsoeo8zZ4dFg";
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+ 
+  // Initialize sync status variables
+  let syncInProgress = false;
+  let autoSyncEnabled = false;
+  let autoSyncInterval = null;
+ 
+  // Function to sync all data with Supabase
+  async function syncAllData() {
+    if (syncInProgress) return;
+   
+    syncInProgress = true;
+    const syncButton = document.getElementById('btnSyncNow');
+    const originalText = syncButton.textContent;
+    syncButton.textContent = '⏳ Syncing...';
+   
+    try {
+      // 1. Sync user data
+      await syncUserData();
+     
+      // 2. Sync schedule data
+      await syncScheduleData();
+     
+      // 3. Sync resources
+      await syncResourceData();
+     
+      // 4. Sync location data
+      await syncLocationData();
+     
+      // Show success message
+      syncButton.textContent = '✅ Synced!';
+      setTimeout(() => {
+        syncButton.textContent = originalText;
+      }, 2000);
+     
+    } catch (error) {
+      console.error('Sync failed:', error);
+      syncButton.textContent = '❌ Failed!';
+      setTimeout(() => {
+        syncButton.textContent = originalText;
+      }, 2000);
+     
+    } finally {
+      syncInProgress = false;
+    }
+  }
+ 
+async function syncUserData() {
+  try {
+    // Get existing users from Supabase
+    const { data: existingUsers, error: fetchError } = await supabase
+      .from('users')
+      .select('*');
+     
+    if (fetchError) throw fetchError;
+   
+    // Update UI if on user management page
+    if (document.getElementById('page3').classList.contains('active') && isAdmin) {
+      loadUserList();
+    }
+  } catch (error) {
+    console.error('Error syncing user data:', error);
+  }
+}
+
+async function syncScheduleData() {
+  try {
+    // Get existing schedules from Supabase
+    const { data: existingScheds, error: fetchError } = await supabase
+      .from('schedules')
+      .select('*')
+      .eq('user', currentUser)
+      .order('created_at', { ascending: false })
+      .limit(50);
+     
+    if (fetchError) throw fetchError;
+   
+    // Update UI
+    populateSavedFirst();
+    populateSaved();
+  } catch (error) {
+    console.error('Error syncing schedule data:', error);
+  }
+}
+
+async function syncResourceType(resourceType) {
+  try {
+    // Get existing resources from Supabase
+    const { data: existingResources, error: fetchError } = await supabase
+      .from(resourceType)
+      .select('*');
+     
+    if (fetchError) throw fetchError;
+   
+    // Update UI based on resource type
+    if (resourceType === 'crews') renderCrew();
+    else if (resourceType === 'trucks') renderTruck();
+    else if (resourceType === 'trailers') renderTrailer();
+    else if (resourceType === 'equipment') renderEquipment();
+    else if (resourceType === 'combos') renderCombo();
+  } catch (error) {
+    console.error(`Error syncing ${resourceType}:`, error);
+  }
+}
+
+async function syncLocationData() {
+  try {
+    // Get existing location data from Supabase
+    const { data: existingLocations, error: fetchError } = await supabase
+      .from('locations')
+      .select('*')
+      .eq('user', currentUser)
+      .single();
+     
+    if (fetchError && fetchError.code !== 'PGRST116') throw fetchError; // Ignore "not found" error
+   
+    // Update UI if on the locations page
+    if (existingLocations && document.getElementById('page4').classList.contains('active')) {
+      loadLocations();
+    }
+  } catch (error) {
+    console.error('Error syncing location data:', error);
+  }
+}
+ 
+  // Toggle auto-sync
+  function toggleAutoSync() {
+    const autoSyncBtn = document.getElementById('btnAutoSync');
+   
+    if (autoSyncEnabled) {
+      // Disable auto-sync
+      clearInterval(autoSyncInterval);
+      autoSyncEnabled = false;
+      autoSyncBtn.textContent = '⏱ Auto-sync (30s)';
+      autoSyncBtn.style.backgroundColor = '';
+    } else {
+      // Enable auto-sync
+      autoSyncEnabled = true;
+      autoSyncBtn.textContent = '⏱ Auto-sync (ON)';
+      autoSyncBtn.style.backgroundColor = '#c8e6c9'; // Light green background
+     
+      // Sync immediately
+      syncAllData();
+     
+      // Set up interval for auto-sync every 30 seconds
+      autoSyncInterval = setInterval(syncAllData, 30000);
+    }
+  }
+ 
+  // Add event listeners when document is loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add event listener for Sync Now button
+    const syncNowBtn = document.getElementById('btnSyncNow');
+    if (syncNowBtn) {
+      syncNowBtn.addEventListener('click', syncAllData);
+    }
+   
+    // Add event listener for Auto Sync button
+    const autoSyncBtn = document.getElementById('btnAutoSync');
+    if (autoSyncBtn) {
+      autoSyncBtn.addEventListener('click', toggleAutoSync);
+    }
+  });
+</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </body>
 </html>
 
+<script>
+function exportToPDF() {
+  const loadingDiv = document.createElement('div');
+  loadingDiv.innerHTML = 'Generating PDF...';
+  loadingDiv.style.position = 'fixed';
+  loadingDiv.style.top = '50%';
+  loadingDiv.style.left = '50%';
+  loadingDiv.style.transform = 'translate(-50%, -50%)';
+  loadingDiv.style.background = 'rgba(0,0,0,0.7)';
+  loadingDiv.style.color = 'white';
+  loadingDiv.style.padding = '20px';
+  loadingDiv.style.borderRadius = '10px';
+  loadingDiv.style.zIndex = '9999';
+  document.body.appendChild(loadingDiv);
 
+  html2canvas(document.getElementById('board')).then(canvas => {
+    const imgData = canvas.toDataURL('image/png');
+    const pdf = new jspdf.jsPDF('l', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+    pdf.setFontSize(18);
+    pdf.text('R&S Weekly Schedule', pdfWidth/2, 15, {align: 'center'});
+    pdf.setFontSize(12);
+    pdf.text('Generated: ' + new Date().toLocaleString(), pdfWidth/2, 22, {align: 'center'});
+    const imgProps = pdf.getImageProperties(imgData);
+    const imgWidth = pdfWidth - 20;
+    const imgHeight = imgWidth * imgProps.height / imgProps.width;
+    pdf.addImage(imgData, 'PNG', 10, 30, imgWidth, imgHeight);
+    pdf.save('schedule_' + new Date().toISOString() + '.pdf');
+    document.body.removeChild(loadingDiv);
+  });
+}
+</script>
 
-
+<script>
+async function initializeUsers() {
+  const { data, error } = await supabase.from('users').select('*');
+  if (error) {
+    console.error('Error fetching users:', error);
+    return;
+  }
+  if (!data || data.length === 0) {
+    await supabase.from('users').insert([
+      { username: 'ADMIN', password: '4630', role: 'admin', passwordChanged: true }
+    ]);
+  } else {
+    const adminExists = data.some(u => u.username.toUpperCase() === 'ADMIN');
+    if (!adminExists) {
+      await supabase.from('users').insert([
+        { username: 'ADMIN', password: '4630', role: 'admin', passwordChanged: true }
+      ]);
+    }
+  }
+}
+document.addEventListener('DOMContentLoaded', function() {
+  initializeUsers();
+});
+</script>
