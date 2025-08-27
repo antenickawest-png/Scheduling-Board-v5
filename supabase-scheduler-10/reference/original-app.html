@@ -1061,8 +1061,7 @@ async function attemptLogin() {
   const password = document.getElementById('password').value;
   
   try {
-    // Sign in with Supabase Auth
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
       email: email,
       password: password
     });
@@ -1074,7 +1073,7 @@ async function attemptLogin() {
               (data.user.user_metadata?.role === 'admin');
     
     // Create or update profile
-    const { error: profileError } = await supabase
+    const { error: profileError } = await supabaseClient
       .from('profiles')
       .upsert([{
         id: data.user.id,
@@ -1115,7 +1114,7 @@ async function attemptLogin() {
 
 async function logout() {
   try {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
     currentUser = null;
     isAdmin = false;
     document.getElementById('loginPage').style.display = 'block';
@@ -1156,7 +1155,7 @@ async function requestPasswordReset() {
   }
   
   try {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
       redirectTo: window.location.origin
     });
     
@@ -2230,7 +2229,8 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
   const SUPABASE_URL = "https://ldbjgdfkjnpxwvrofmkx.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkYmpnZGZram5weHd2cm9mbWt4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4OTMwMTYsImV4cCI6MjA3MDQ2OTAxNn0.2DeJq25bo_3nKG_PhkWaUUssVjUqQSRqsoeo8zZ4dFg";
-  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
  
   // Initialize sync status variables
   let syncInProgress = false;
@@ -2281,7 +2281,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
    
     // First, get existing users from Supabase
-    const { data: existingUsers, error: fetchError } = await supabase
+    const { data: existingUsers, error: fetchError } = await supabaseClient
       .from('users')
       .select('*');
      
@@ -2297,7 +2297,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }));
    
     // Upsert the data
-    const { error: upsertError } = await supabase
+    const { error: upsertError } = await supabaseClient
       .from('users')
       .upsert(dataToUpsert, {
         onConflict: 'username',
@@ -2338,7 +2338,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const scheds = JSON.parse(localStorage.getItem('scheds') || '[]');
    
     // First, get existing schedules from Supabase
-    const { data: existingScheds, error: fetchError } = await supabase
+    const { data: existingScheds, error: fetchError } = await supabaseClient
       .from('schedules')
       .select('*')
       .order('created_at', { ascending: false })
@@ -2356,7 +2356,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }));
    
     // Upsert schedules to Supabase
-    const { error: upsertError } = await supabase
+    const { error: upsertError } = await supabaseClient
       .from('schedules')
       .upsert(localSchedsToUpload, {
         onConflict: 'id',
@@ -2415,7 +2415,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const resources = JSON.parse(localStorage.getItem(resourceType) || '[]');
    
     // First, get existing resources from Supabase
-    const { data: existingResources, error: fetchError } = await supabase
+    const { data: existingResources, error: fetchError } = await supabaseClient
       .from(resourceType)
       .select('*');
      
@@ -2430,7 +2430,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }));
    
     // Upsert resources to Supabase
-    const { error: upsertError } = await supabase
+    const { error: upsertError } = await supabaseClient
       .from(resourceType)
       .upsert(localResourcesToUpload, {
         onConflict: 'id',
@@ -2478,7 +2478,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const locations = JSON.parse(localStorage.getItem('locations') || '{}');
    
     // First, get existing location data from Supabase
-    const { data: existingLocations, error: fetchError } = await supabase
+    const { data: existingLocations, error: fetchError } = await supabaseClient
       .from('locations')
       .select('*')
       .eq('user', currentUser)
@@ -2494,7 +2494,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
    
     // Upsert location data to Supabase
-    const { error: upsertError } = await supabase
+    const { error: upsertError } = await supabaseClient
       .from('locations')
       .upsert(locationData, {
         onConflict: 'user',
@@ -2599,19 +2599,19 @@ function exportToPDF() {
 
 <script>
 async function initializeUsers() {
-  const { data, error } = await supabase.from('users').select('*');
+  const { data, error } = await supabaseClient.from('users').select('*');
   if (error) {
     console.error('Error fetching users:', error);
     return;
   }
   if (!data || data.length === 0) {
-    await supabase.from('users').insert([
+    await supabaseClient.from('users').insert([
       { username: 'ADMIN', password: '4630', role: 'admin', passwordChanged: true }
     ]);
   } else {
     const adminExists = data.some(u => u.username.toUpperCase() === 'ADMIN');
     if (!adminExists) {
-      await supabase.from('users').insert([
+      await supabaseClient.from('users').insert([
         { username: 'ADMIN', password: '4630', role: 'admin', passwordChanged: true }
       ]);
     }
@@ -2626,7 +2626,7 @@ document.addEventListener('DOMContentLoaded', function() {
 async function loadUsers() {
   try {
     // Get users from Supabase Auth (admin only)
-    const { data: { users }, error } = await supabase.auth.admin.listUsers();
+    const { data: { users }, error } = await supabaseClient.auth.admin.listUsers();
     if (error) throw error;
     
     const tableBody = document.getElementById('userTableBody');
@@ -2692,7 +2692,7 @@ async function addUser() {
   
   try {
     // Create user in Supabase Auth
-    const { data, error } = await supabase.auth.admin.createUser({
+    const { data, error } = await supabaseClient.auth.admin.createUser({
       email: email,
       password: DEFAULT_PASSWORD,
       user_metadata: { 
@@ -2705,7 +2705,7 @@ async function addUser() {
     if (error) throw error;
     
     // Create profile record
-    const { error: profileError } = await supabase
+    const { error: profileError } = await supabaseClient
       .from('profiles')
       .insert([{
         id: data.user.id,
@@ -2731,7 +2731,7 @@ async function addUser() {
 
 async function resetPassword(userId) {
   try {
-    const { error } = await supabase.auth.admin.updateUserById(userId, {
+    const { error } = await supabaseClient.auth.admin.updateUserById(userId, {
       password: DEFAULT_PASSWORD,
       user_metadata: { passwordChanged: false }
     });
@@ -2749,12 +2749,12 @@ async function resetPassword(userId) {
 async function resetAllPasswords() {
   if (confirm('Are you sure you want to reset ALL user passwords to 1234?')) {
     try {
-      const { data: { users }, error } = await supabase.auth.admin.listUsers();
+      const { data: { users }, error } = await supabaseClient.auth.admin.listUsers();
       if (error) throw error;
       
       for (const user of users) {
         if (user.email !== currentUser) {
-          await supabase.auth.admin.updateUserById(user.id, {
+          await supabaseClient.auth.admin.updateUserById(user.id, {
             password: DEFAULT_PASSWORD,
             user_metadata: { ...user.user_metadata, passwordChanged: false }
           });
@@ -2772,7 +2772,7 @@ async function resetAllPasswords() {
 
 async function deleteUser(userId) {
   try {
-    const { data: { users }, error: listError } = await supabase.auth.admin.listUsers();
+    const { data: { users }, error: listError } = await supabaseClient.auth.admin.listUsers();
     if (listError) throw listError;
     
     const user = users.find(u => u.id === userId);
@@ -2780,7 +2780,7 @@ async function deleteUser(userId) {
     
     if (confirm(`Are you sure you want to delete user ${user.email}?`)) {
       // Delete from profiles table first
-      const { error: profileError } = await supabase
+      const { error: profileError } = await supabaseClient
         .from('profiles')
         .delete()
         .eq('id', userId);
@@ -2788,7 +2788,7 @@ async function deleteUser(userId) {
       if (profileError) throw profileError;
       
       // Delete from Supabase Auth
-      const { error } = await supabase.auth.admin.deleteUser(userId);
+      const { error } = await supabaseClient.auth.admin.deleteUser(userId);
       if (error) throw error;
       
       loadUsers();
@@ -2799,3 +2799,5 @@ async function deleteUser(userId) {
     alert('Error deleting user: ' + error.message);
   }
 }
+</script>
+
