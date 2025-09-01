@@ -1,19 +1,33 @@
+# Netlify configuration file
+
+# Build settings
 [build]
-  base = "supabase-scheduler-10/reference"
-  publish = "."
-  command = "echo 'No build needed for static HTML'"
+  # Directory to publish (the directory that contains the built site)
+  publish = "src"
+  # No build command needed for this static HTML site
+  command = ""
 
-[build.environment]
-  NODE_VERSION = "18"
-
+# Redirects and rewrites
 [[redirects]]
   from = "/*"
-  to = "/original-app.html"
+  to = "/index.html"
   status = 200
-  force = false
 
-# Optional: Set custom headers for your HTML file
+# Headers to set
 [[headers]]
-  for = "/*.html"
-  [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
+  # Define which paths this specific [[headers]] block will cover
+  for = "/*"
+    [headers.values]
+    # Multi-key header rules are expressed with multi-line strings
+    cache-control = '''
+    max-age=0,
+    no-cache,
+    no-store,
+    must-revalidate'''
+    # This is a single value header
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    Content-Security-Policy = "default-src 'self' https://ldbjgdfkjnpxwvrofmkx.supabase.co https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://ldbjgdfkjnpxwvrofmkx.supabase.co;"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
