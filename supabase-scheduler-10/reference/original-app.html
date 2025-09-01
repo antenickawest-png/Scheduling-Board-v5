@@ -805,7 +805,11 @@ h1, h2 {
     <h2>🔐 R&S Weekly Schedule</h2>
     <div id="loginError" class="login-error">Invalid username or password</div>
     <form class="login-form" id="loginForm" onsubmit="return false;">
-      <input type="email" id="username" placeholder="Email" required>
+                    <div class="form-group">
+                        <label for="username">Email:</label>
+                        <!-- Updated placeholder and input type for email -->
+                        <input type="email" id="username" placeholder="Enter your email" required>
+                    </div>
       <input type="password" id="password" placeholder="Password" required>
       <button type="submit" onclick="attemptLogin()">🚀 Login</button>
       <div class="forgot-password" onclick="showForgotPassword()">Forgot password?</div>
@@ -1056,39 +1060,37 @@ let currentUser = null;
 let isAdmin = false;
 const DEFAULT_PASSWORD = '1234';
 
-async function attemptLogin() {
-  const email = document.getElementById('username').value;
-  const password = document.getElementById('password').value;
+// Initialize users if not exists
+if (!localStorage.getItem('users')) {
+        const defaultUsers = [
+    { username: 'ADMIN', password: '4630', role: 'admin', passwordChanged: true }
+  ];
+  localStorage.setItem('users', JSON.stringify(defaultUsers));
+}
+
+function attemptLogin() {
+            const email = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const users = JSON.parse(localStorage.getItem('users'));
   
-  try {
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
-      email: email,
-      password: password
-    });
+  const user = users.find(u => u.username === email && u.password === password);
+            
+            if (user) {
+                currentUser = user.username;
+                isAdmin = user.role === 'admin';
     
-    if (error) throw error;
-    
-    currentUser = data.user.email;
-    isAdmin = (currentUser === 'antenicka.west@rnstower.com') || 
-              (data.user.user_metadata?.role === 'admin');
-    
-    // Create or update profile
-    const { error: profileError } = await supabaseClient
-      .from('profiles')
-      .upsert([{
-        id: data.user.id,
-        email: currentUser,
-        role: isAdmin ? 'admin' : 'view',
-        updated_at: new Date().toISOString()
-      }]);
-    
-    if (profileError) console.error('Profile error:', profileError);
+    // Check if password needs to be changed (for non-admin users)
+    if (user.role === 'view' && (!user.passwordChanged || user.passwordChanged === false)) {
+      showPasswordChangeModal();
+      return;
+    }
     
     // Update UI
     document.getElementById('loginPage').style.display = 'none';
     document.getElementById('appContainer').style.display = 'block';
     document.getElementById('currentUser').textContent = currentUser;
-    document.getElementById('userRole').textContent = isAdmin ? 'admin' : 'view';
+    document.getElementById('userRole').textContent = user.role;
     
     // Show/hide admin features
     updateAdminVisibility();
@@ -1102,9 +1104,7 @@ async function attemptLogin() {
     if (isAdmin) {
       loadUsers();
     }
-    
-  } catch (error) {
-    console.error('Login error:', error);
+  } else {
     document.getElementById('loginError').style.display = 'block';
     setTimeout(() => {
       document.getElementById('loginError').style.display = 'none';
@@ -1112,18 +1112,70 @@ async function attemptLogin() {
   }
 }
 
-async function logout() {
-  try {
-    await supabaseClient.auth.signOut();
-    currentUser = null;
-    isAdmin = false;
-    document.getElementById('loginPage').style.display = 'block';
-    document.getElementById('appContainer').style.display = 'none';
-    document.getElementById('username').value = '';
-    document.getElementById('password').value = '';
-  } catch (error) {
-    console.error('Logout error:', error);
+function showPasswordChangeModal() {
+  document.getElementById('passwordChangeModal').style.display = 'block';
+  document.getElementById('newPassword1').value = '';
+  document.getElementById('newPassword2').value = '';
+  document.getElementById('passwordChangeMessage').style.display = 'none';
+}
+
+function closePasswordChange() {
+  document.getElementById('passwordChangeModal').style.display = 'none';
+  // Log out if they cancel password change
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
+}
+
+function changePassword() {
+  const newPassword1 = document.getElementById('newPassword1').value;
+  const newPassword2 = document.getElementById('newPassword2').value;
+  
+  if (!newPassword1 || !newPassword2) {
+    document.getElementById('passwordChangeMessage').textContent = 'Please fill in both fields';
+    document.getElementById('passwordChangeMessage').style.display = 'block';
+    return;
   }
+  
+  if (newPassword1 !== newPassword2) {
+    document.getElementById('passwordChangeMessage').textContent = 'Passwords do not match';
+    document.getElementById('passwordChangeMessage').style.display = 'block';
+    return;
+  }
+  
+  // Update password
+  const users = JSON.parse(localStorage.getItem('users'));
+  const userIndex = users.findIndex(u => u.username === currentUser);
+  
+  if (userIndex !== -1) {
+    users[userIndex].password = newPassword1;
+    users[userIndex].passwordChanged = true;
+    localStorage.setItem('users', JSON.stringify(users));
+    
+    // Close modal and continue to app
+    document.getElementById('passwordChangeModal').style.display = 'none';
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('appContainer').style.display = 'block';
+    document.getElementById('currentUser').textContent = currentUser;
+    document.getElementById('userRole').textContent = users[userIndex].role;
+    
+    // Show/hide admin features
+    updateAdminVisibility();
+    
+    // Load data
+    renderAll();
+    populateSavedFirst();
+    populateSaved();
+    loadLocationData();
+  }
+}
+
+function logout() {
+  currentUser = null;
+  isAdmin = false;
+  document.getElementById('loginPage').style.display = 'flex';
+  document.getElementById('appContainer').style.display = 'none';
+  document.getElementById('username').value = '';
+  document.getElementById('password').value = '';
 }
 
 function updateAdminVisibility() {
@@ -1144,33 +1196,22 @@ function closeForgotPassword() {
   document.getElementById('resetMessage').style.display = 'none';
 }
 
-async function requestPasswordReset() {
-  const email = document.getElementById('resetUsername').value;
+function requestPasswordReset() {
+  const username = document.getElementById('resetUsername').value;
+  const users = JSON.parse(localStorage.getItem('users'));
   
-  if (!email) {
-    document.getElementById('resetMessage').textContent = 'Please enter your email address.';
-    document.getElementById('resetMessage').style.color = '#e74c3c';
-    document.getElementById('resetMessage').style.display = 'block';
-    return;
-  }
+  const userExists = users.some(u => u.username === username);
   
-  try {
-    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin
-    });
-    
-    if (error) throw error;
-    
-    document.getElementById('resetMessage').textContent = 'Password reset email sent! Check your inbox.';
+  if (userExists) {
+    document.getElementById('resetMessage').textContent = 'Password reset request sent. Please contact your administrator.';
     document.getElementById('resetMessage').style.color = '#27ae60';
     document.getElementById('resetMessage').style.display = 'block';
     
     setTimeout(() => {
       closeForgotPassword();
     }, 3000);
-  } catch (error) {
-    console.error('Password reset error:', error);
-    document.getElementById('resetMessage').textContent = 'Error sending reset email. Please try again.';
+  } else {
+    document.getElementById('resetMessage').textContent = 'Username not found.';
     document.getElementById('resetMessage').style.color = '#e74c3c';
     document.getElementById('resetMessage').style.display = 'block';
   }
@@ -2229,8 +2270,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
   const SUPABASE_URL = "https://ldbjgdfkjnpxwvrofmkx.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxkYmpnZGZram5weHd2cm9mbWt4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ4OTMwMTYsImV4cCI6MjA3MDQ2OTAxNn0.2DeJq25bo_3nKG_PhkWaUUssVjUqQSRqsoeo8zZ4dFg";
-  
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
  
   // Initialize sync status variables
   let syncInProgress = false;
@@ -2281,7 +2321,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
    
     // First, get existing users from Supabase
-    const { data: existingUsers, error: fetchError } = await supabaseClient
+    const { data: existingUsers, error: fetchError } = await supabase
       .from('users')
       .select('*');
      
@@ -2297,7 +2337,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }));
    
     // Upsert the data
-    const { error: upsertError } = await supabaseClient
+    const { error: upsertError } = await supabase
       .from('users')
       .upsert(dataToUpsert, {
         onConflict: 'username',
@@ -2338,7 +2378,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const scheds = JSON.parse(localStorage.getItem('scheds') || '[]');
    
     // First, get existing schedules from Supabase
-    const { data: existingScheds, error: fetchError } = await supabaseClient
+    const { data: existingScheds, error: fetchError } = await supabase
       .from('schedules')
       .select('*')
       .order('created_at', { ascending: false })
@@ -2356,7 +2396,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }));
    
     // Upsert schedules to Supabase
-    const { error: upsertError } = await supabaseClient
+    const { error: upsertError } = await supabase
       .from('schedules')
       .upsert(localSchedsToUpload, {
         onConflict: 'id',
@@ -2415,7 +2455,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const resources = JSON.parse(localStorage.getItem(resourceType) || '[]');
    
     // First, get existing resources from Supabase
-    const { data: existingResources, error: fetchError } = await supabaseClient
+    const { data: existingResources, error: fetchError } = await supabase
       .from(resourceType)
       .select('*');
      
@@ -2430,7 +2470,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }));
    
     // Upsert resources to Supabase
-    const { error: upsertError } = await supabaseClient
+    const { error: upsertError } = await supabase
       .from(resourceType)
       .upsert(localResourcesToUpload, {
         onConflict: 'id',
@@ -2478,7 +2518,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const locations = JSON.parse(localStorage.getItem('locations') || '{}');
    
     // First, get existing location data from Supabase
-    const { data: existingLocations, error: fetchError } = await supabaseClient
+    const { data: existingLocations, error: fetchError } = await supabase
       .from('locations')
       .select('*')
       .eq('user', currentUser)
@@ -2494,7 +2534,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
    
     // Upsert location data to Supabase
-    const { error: upsertError } = await supabaseClient
+    const { error: upsertError } = await supabase
       .from('locations')
       .upsert(locationData, {
         onConflict: 'user',
@@ -2599,19 +2639,19 @@ function exportToPDF() {
 
 <script>
 async function initializeUsers() {
-  const { data, error } = await supabaseClient.from('users').select('*');
+  const { data, error } = await supabase.from('users').select('*');
   if (error) {
     console.error('Error fetching users:', error);
     return;
   }
   if (!data || data.length === 0) {
-    await supabaseClient.from('users').insert([
+    await supabase.from('users').insert([
       { username: 'ADMIN', password: '4630', role: 'admin', passwordChanged: true }
     ]);
   } else {
     const adminExists = data.some(u => u.username.toUpperCase() === 'ADMIN');
     if (!adminExists) {
-      await supabaseClient.from('users').insert([
+      await supabase.from('users').insert([
         { username: 'ADMIN', password: '4630', role: 'admin', passwordChanged: true }
       ]);
     }
@@ -2621,183 +2661,3 @@ document.addEventListener('DOMContentLoaded', function() {
   initializeUsers();
 });
 </script>
-
-// User Management
-async function loadUsers() {
-  try {
-    // Get users from Supabase Auth (admin only)
-    const { data: { users }, error } = await supabaseClient.auth.admin.listUsers();
-    if (error) throw error;
-    
-    const tableBody = document.getElementById('userTableBody');
-    tableBody.innerHTML = '';
-    
-    users.forEach(user => {
-      const row = document.createElement('tr');
-      
-      const usernameCell = document.createElement('td');
-      usernameCell.textContent = user.email;
-      row.appendChild(usernameCell);
-      
-      const roleCell = document.createElement('td');
-      // Get role from user metadata or profiles table
-      roleCell.textContent = user.user_metadata?.role || 'view';
-      row.appendChild(roleCell);
-      
-      const passwordStatusCell = document.createElement('td');
-      passwordStatusCell.textContent = user.user_metadata?.passwordChanged ? 'Changed' : 'Default';
-      row.appendChild(passwordStatusCell);
-      
-      const actionsCell = document.createElement('td');
-      
-      // Don't allow actions on the current user
-      if (user.email !== currentUser) {
-        const resetBtn = document.createElement('button');
-        resetBtn.textContent = '🔑 Reset';
-        resetBtn.className = 'action-btn reset-btn';
-        resetBtn.onclick = () => resetPassword(user.id);
-        actionsCell.appendChild(resetBtn);
-        
-        const deleteBtn = document.createElement('button');
-        deleteBtn.textContent = '🗑️ Delete';
-        deleteBtn.className = 'action-btn delete-btn';
-        deleteBtn.onclick = () => deleteUser(user.id);
-        actionsCell.appendChild(deleteBtn);
-      } else {
-        actionsCell.textContent = 'Current User';
-      }
-      
-      row.appendChild(actionsCell);
-      tableBody.appendChild(row);
-    });
-  } catch (error) {
-    console.error('Error loading users:', error);
-    alert('Error loading users. Make sure you have admin privileges.');
-  }
-}
-
-async function addUser() {
-  const email = document.getElementById('newUsername').value;
-  const role = document.getElementById('newRole').value;
-  
-  if (!email) {
-    alert('Please enter an email address');
-    return;
-  }
-  
-  if (!email.includes('@')) {
-    alert('Please enter a valid email address');
-    return;
-  }
-  
-  try {
-    // Create user in Supabase Auth
-    const { data, error } = await supabaseClient.auth.admin.createUser({
-      email: email,
-      password: DEFAULT_PASSWORD,
-      user_metadata: { 
-        role: role,
-        passwordChanged: false
-      },
-      email_confirm: true
-    });
-    
-    if (error) throw error;
-    
-    // Create profile record
-    const { error: profileError } = await supabaseClient
-      .from('profiles')
-      .insert([{
-        id: data.user.id,
-        email: email,
-        role: role,
-        created_at: new Date().toISOString()
-      }]);
-    
-    if (profileError) throw profileError;
-    
-    // Clear form
-    document.getElementById('newUsername').value = '';
-    
-    // Reload user list
-    loadUsers();
-    
-    alert(`User ${email} added with default password: ${DEFAULT_PASSWORD}`);
-  } catch (error) {
-    console.error('Error adding user:', error);
-    alert('Error adding user: ' + error.message);
-  }
-}
-
-async function resetPassword(userId) {
-  try {
-    const { error } = await supabaseClient.auth.admin.updateUserById(userId, {
-      password: DEFAULT_PASSWORD,
-      user_metadata: { passwordChanged: false }
-    });
-    
-    if (error) throw error;
-    
-    alert(`Password has been reset to ${DEFAULT_PASSWORD}`);
-    loadUsers();
-  } catch (error) {
-    console.error('Error resetting password:', error);
-    alert('Error resetting password: ' + error.message);
-  }
-}
-
-async function resetAllPasswords() {
-  if (confirm('Are you sure you want to reset ALL user passwords to 1234?')) {
-    try {
-      const { data: { users }, error } = await supabaseClient.auth.admin.listUsers();
-      if (error) throw error;
-      
-      for (const user of users) {
-        if (user.email !== currentUser) {
-          await supabaseClient.auth.admin.updateUserById(user.id, {
-            password: DEFAULT_PASSWORD,
-            user_metadata: { ...user.user_metadata, passwordChanged: false }
-          });
-        }
-      }
-      
-      alert('All passwords have been reset to 1234');
-      loadUsers();
-    } catch (error) {
-      console.error('Error resetting passwords:', error);
-      alert('Error resetting passwords: ' + error.message);
-    }
-  }
-}
-
-async function deleteUser(userId) {
-  try {
-    const { data: { users }, error: listError } = await supabaseClient.auth.admin.listUsers();
-    if (listError) throw listError;
-    
-    const user = users.find(u => u.id === userId);
-    if (!user) throw new Error('User not found');
-    
-    if (confirm(`Are you sure you want to delete user ${user.email}?`)) {
-      // Delete from profiles table first
-      const { error: profileError } = await supabaseClient
-        .from('profiles')
-        .delete()
-        .eq('id', userId);
-      
-      if (profileError) throw profileError;
-      
-      // Delete from Supabase Auth
-      const { error } = await supabaseClient.auth.admin.deleteUser(userId);
-      if (error) throw error;
-      
-      loadUsers();
-      alert('User deleted successfully');
-    }
-  } catch (error) {
-    console.error('Error deleting user:', error);
-    alert('Error deleting user: ' + error.message);
-  }
-}
-</script>
-
