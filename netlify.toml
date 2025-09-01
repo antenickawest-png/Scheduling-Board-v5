@@ -3,7 +3,7 @@
 # Build settings
 [build]
   # Directory to publish (the directory that contains the built site)
-  publish = "src"
+  publish = "."
   # No build command needed for this static HTML site
   command = ""
 
